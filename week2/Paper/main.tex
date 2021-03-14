@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper,twocolumn,twoside]{article}
+\documentclass[12pt,a4paper,twocolumn,twoside]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{multicol}
 \usepackage{graphicx}
@@ -14,8 +14,9 @@
 \usepackage{url}
 \usepackage{eurosym}
 \usepackage{longtable}
+\usepackage{dblfloatfix}
 \usepackage[sorting=none]{biblatex}
-\usepackage[top=2cm, bottom=1.6cm, left=2cm, right=2cm]{geometry}
+\usepackage[top=2.2cm, bottom=2.2cm, left=2cm, right=2cm]{geometry}
 \usepackage[figurename=Fig.,tablename=TABLE]{caption}
 \setlength{\parskip}{0.3em}
 \addbibresource{Resources/refs.bib}
@@ -28,6 +29,9 @@
 }
 
 \fancyhead[RE]{\scriptsize Master in Computer Vision, CVC. Module 5: Visual Recognition}
+\fancyhead[LO]{\scriptsize Master in Computer Vision, CVC. Module 5: Visual Recognition}
+\fancyhead[RO]{\thepage}
+\fancyhead[LE]{\thepage}
 \fancyfoot[CO,CE]{}
 
 \title{\Huge\sffamily Object detection: State of the Art}
@@ -48,7 +52,7 @@ Oriol Catalan, Victor Casales }
 \twocolumn[\begin{@twocolumnfalse}
 \begin{center}
 \maketitle
-\parbox{0.9\textwidth}
+\parbox{0.8\textwidth}
 {\sffamily
 \textbf{Abstract --}In this document, we will do a quick recap of the current advances in object detection and segmentation, using the evolution of the CNN into the Mask R-CNN method. 
 
@@ -69,10 +73,10 @@ Oriol Catalan, Victor Casales }
 \end{@twocolumnfalse}]
 
 
-\blfootnote{$\bullet$ Stanley Albayeros: stanley.albayeros@gmail.com}
-\blfootnote{$\bullet$ Alejandro Zarate: alejandro.zarate@e-campus.uab.cat}
-\blfootnote{$\bullet$ Oriol Catalán: oriol.catalan@e-campus.uab.cat}
-\blfootnote{$\bullet$ Víctor Casales: victor.casales@e-campus.uab.cat}
+\blfootnote{Stanley Albayeros: stanley.albayeros@gmail.com}
+\blfootnote{Alejandro Zarate: alejandro.zarate@e-campus.uab.cat}
+\blfootnote{Oriol Catalán: oriol.catalan@e-campus.uab.cat}
+\blfootnote{Víctor Casales: victor.casales@e-campus.uab.cat}
 
 \maketitle
 
@@ -102,7 +106,7 @@ Object segmentation, also called semantic segmentation, seeks to create a per-pi
 \subsection{Origin}
 Convolutional neural networks (CNNs) were inspired by the vision processing in living organisms. In 1968, Hubel and Wiesel published a paper\cite{hubel_wiesel_1968} identifying two basic cell types in the brain: simple and complex cells. According to their study, simple cells are specialized to maximize their output when they detect straight edges with particular orientations, while complex cells have a much larger field of detection, and their output is not sensitive to the exact position to the edges in their area. Hubel and Wiesel proposed the cascading model of these two cell types for use in pattern recognition. 
 
-In 1980, Fukushima\cite{fukushima_1980} introduced the neocognitron, the basis of the two basic types of layers in CNNs: Convolutional layers, and Downsampling layers. The convolutional layers are the equivalent to biological simple cell types, while the downsampling layers are the equivalent to the biological complex cell types, covering large patches of the previous layers. 
+In 1980, Fukushima\cite{fukushima_1980} introduced the neocognitron, the basis of the two basic types of layers in CNNs: Convolutional layers, and Downsampling layers. The convolutional layers in a neural network are the equivalent to biological simple cell types, while the downsampling layers are the equivalent to the biological complex cell types, covering large patches of the previous layers. 
 
 LeCunn et al. published in 1989\cite{LeCunn} their mythical Lenet paper, cementing the foundations of modern computer vision as we know it.
 
@@ -122,6 +126,7 @@ R-CNNs have the downside of being slower, even though they require the use of pr
 \subsection{Fast R-CNNs}
 
 Being extremely computationally expensive, R-CNN's bottleneck is the need to extract features for each proposed region independently. Since there is a disconnect between the network dedicated to region selection and feature extraction, and these regions overlap between each other, this feature extraction process results in a very high amount of repetitive and unnecessary computations. To solve this, in 2015  Girshick\cite{girshick_2015} proposes the Fast R-CNN architecture. 
+
 Compared to previous architectures, Girshick introduces Region of Interest (RoI) pooling. Girshick uses the entire image as the original CNN input for feature extraction bypassing the region proposal method. The pipeline of fast R-CNN is as follow:
 
 \begin{enumerate}
@@ -133,8 +138,14 @@ Compared to previous architectures, Girshick introduces Region of Interest (RoI)
     \item Combining these two last changes to the shape of the layers, the class and bounding box are predict for each proposed region.
 \end{enumerate}
 
-\subsection{Faster R-CNN}
+\begin{figure*}[hb!]    
+    \centering
+        \includegraphics[width=0.9\textwidth]{Resources/Images/detr.png}
+    \captionof{figure}{End-to-End Object Detection with Transformers (DETR) Pipeline}
+    \label{fig:detr}
+\end{figure*}
 
+\subsection{Faster R-CNN}
 The main issue with Fast R-CNNs is that it requires a high amount of region proposals generated in the initial selective search. This is computationally expensive and, as with the original R-CNN, results in unnecessary computations. 
 
 The Faster R-CNN architecture, proposed by Shaoqin Ren, Kaiming He, Ross Girshick and Jian Sun\cite{ren_he_girshick_sun_2015} fixes this by replacing the selective search with a completely new neural network devoted solely to region proposal: a Region Proposal Network (RPN). 
@@ -142,43 +153,20 @@ The Faster R-CNN architecture, proposed by Shaoqin Ren, Kaiming He, Ross Girshic
 The RPN is a fully convolutional network that predicts object bounding boxes and a confidence score. These bounding boxes are used as the input regions for the RoI pooling. The RPN is trained along the rest of the model, and can learn to generate high quality proposed regions, reducing the total number of regions that needs to be processed without affecting the precision of object detection negatively. 
 
 \subsection{Mask R-CNN}
-
 On March 2017, Kaiming He et al.\cite{he_gkioxari_dollár_girshick_2017} publish a second paper improving their architecture even further. Kaiming et al. extend the Faster R-CNN architecture following a similiar line of thought as they did with the RPN proposal: by adding a convolutional network after the RoI align to locate objects at a pixel level within the image. This aditional CNN runs parallel with the bounding box detection and class prediction branches. 
 
 The added CNN is a feature pyramid network-styled CNN, consisting of a bottom-up pathway composed of any ConvNet/ResNet/VGG, that extracts features from raw images, a top-bottom pathway that generates a feature pyramid map, and two lateral convolution/addition operations between the corresponding levels of the two pathways. This FPN outperforms traditional ConvNets because it mantains features at various resolution scales. 
 
 \subsection{Mesh R-CNN}
-
 After mask R-CNNs, in 2019 Georgia Gkioxari, Jitendra Malik and Justin Johnson\cite{gkioxari_malik_johnson_2019} published a paper improving the pipeline to predict 3D shapes out of 2D images. They modify mask R-CNN in the same way the past two sections have done so: by introducing a new network to the pipeline. 
 
-
 Gkioxari's team introduces a mesh prediction branch that triangle meshes predicting the shapes of the detected objects in three dimentions, following a pyramidal structure. They first predict coarse representations of the features, and then use these as inputs to a graph convolution network to refine them. These meshes are then put through ShapeNet where they are validated.
-\pagebreak
 
-
-\twocolumn[{
-
-    \centering
-        \includegraphics[width=0.9\textwidth]{Resources/Images/detr.png}
-    \captionof{figure}{End-to-End Object Detection with Transformers (DETR) Pipeline}
-    \label{fig:detr}
-
-\vspace{.25 in}
-}]
-    
 \section{End-to-End Object Detection with Transformers (DETR)}
-
 The Facebook Research team has developed an object detection model, Detection with Transformers (DETR)\cite{carion_massa_synnaeve_usunier_kirillov_zagoruyko_2020}, that moves away from using R-CNN as the backbone of their pipeline, and instead utilize a transformer architecture. 
 
-Seeing how previous approaches to object detection have to deal with post-processing of the output of their components due to duplicate (or irrelevant) predictions, the DETR team seeks to simplify the object detection pipeline by shifting to a direct set prediction model, with the objective of translating the improvements that transformer networks have brought upon the Natural Language Processing(NLP) scene into the computer vision scene. 
-
+Seeing how previous approaches to object detection have to deal with post-processing of the output of their components due to duplicate (or irrelevant) predictions, the DETR team seeks to simplify the object detection pipeline by shifting to a direct set prediction model, with the objective of translating the improvements that transformer networks have brought upon the Natural Language Processing(NLP) scene into the computer vision scene.
 
 As a baseline architecture proposal, DETR seeks to match the performance of Faster R-CNN pipelines. According to the DETR paper, the new transformer-based architecture(Fig. 3) generally outperforms Faster R-CNN, except when there are many small objects, where it obtains a worse performance.
-
-
-
-
 \printbibliography
-
-
 \end{document}

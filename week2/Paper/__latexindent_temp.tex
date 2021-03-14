@@ -1,13 +1,9 @@
-umn[\begin{@twocolumnfalse}
 
-\begin{center}
-    
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.8\textwidth]{Resources/Images/detr.png}
-    \caption{Object Detection with Transformers}
-    \label{fig:DETR}
-    \end{figure}
+\section{End-to-End Object Detection with Transformers (DETR)}
 
-\end{center}
-\end{@twocolumnfalse}]
+The Facebook Research team has developed an object detection model, Detection with Transformers (DETR)\cite{carion_massa_synnaeve_usunier_kirillov_zagoruyko_2020}, that moves away from using R-CNN as the backbone of their pipeline, and instead utilize a transformer architecture. 
+
+Seeing how previous approaches to object detection have to deal with post-processing of the output of their components due to duplicate (or irrelevant) predictions, the DETR team seeks to simplify the object detection pipeline by shifting to a direct set prediction model, with the objective of translating the improvements that transformer networks have brought upon the Natural Language Processing(NLP) scene into the computer vision scene. 
+
+
+As a baseline architecture proposal, DETR seeks to match the performance of Faster R-CNN pipelines. According to the DETR paper, the new transformer-based architecture(Fig. 3) generally outperforms Faster R-CNN, except when there are many small objects, where it obtains a worse performance.
