@@ -19,7 +19,6 @@
 \usepackage[figurename=Fig.,tablename=TABLE]{caption}
 \setlength{\parskip}{0.3em}
 \addbibresource{Resources/refs.bib}
-\captionsetup[table]{textfont=sc}
 
 \newcommand\blfootnote[1]{%
   \begingroup
@@ -76,6 +75,7 @@ Oriol Catalan, Victor Casales }
 \blfootnote{$\bullet$ Víctor Casales: victor.casales@e-campus.uab.cat}
 
 \maketitle
+
 \section{Introduction}
 
 \lettrine[lines=2]{O}{b}ject detection refers to the ability to identify some or all of the objects represented in an image by rough location and/or class. Object detection is usually signaled by bounding boxes (Fig.\ref{fig:Object_detection}).
@@ -84,7 +84,7 @@ Oriol Catalan, Victor Casales }
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.9\linewidth]{Resources/Images/object detection.jpg}
+\includegraphics[width=0.9\linewidth]{Resources/Images/object_detection.jpg}
 \caption{Object detection}
 \label{fig:Object_detection}
 \end{figure}
@@ -159,9 +159,9 @@ Gkioxari's team introduces a mesh prediction branch that triangle meshes predict
 \twocolumn[{
 
     \centering
-        \includegraphics[width=90mm]{Resources/Images/detr.png}
-    \captionof{figure}{Hollywood and Beverly Hills}
-    \label{fig: hbh}
+        \includegraphics[width=0.9\textwidth]{Resources/Images/detr.png}
+    \captionof{figure}{End-to-End Object Detection with Transformers (DETR) Pipeline}
+    \label{fig:detr}
 
 \vspace{.25 in}
 }]
@@ -172,7 +172,8 @@ The Facebook Research team has developed an object detection model, Detection wi
 
 Seeing how previous approaches to object detection have to deal with post-processing of the output of their components due to duplicate (or irrelevant) predictions, the DETR team seeks to simplify the object detection pipeline by shifting to a direct set prediction model, with the objective of translating the improvements that transformer networks have brought upon the Natural Language Processing(NLP) scene into the computer vision scene. 
 
-As a baseline architecture proposal, DETR seeks to match the performance of Faster R-CNN pipelines. According to the DETR paper, the new transformer-based architecture generally outperforms Faster R-CNN, except when there are many small objects, where it obtains a worse performance.
+
+As a baseline architecture proposal, DETR seeks to match the performance of Faster R-CNN pipelines. According to the DETR paper, the new transformer-based architecture(Fig. 3) generally outperforms Faster R-CNN, except when there are many small objects, where it obtains a worse performance.
 
 
 
