@@ -1,0 +1,23 @@
+[0] Config.pm:311> INFO - This is Biber 2.16
+[0] Config.pm:314> INFO - Logfile is 'main.blg'
+[124] biber-MSWIN64:340> INFO - === 
+[173] Biber.pm:415> INFO - Reading 'main.bcf'
+[299] Biber.pm:952> INFO - Found 9 citekeys in bib section 0
+[314] Biber.pm:4340> INFO - Processing section 0
+[326] Biber.pm:4531> INFO - Looking for bibtex format file 'Resources/refs.bib' for section 0
+[384] bibtex.pm:1689> INFO - LaTeX decoding ...
+[397] bibtex.pm:1494> INFO - Found BibTeX data source 'Resources/refs.bib'
+[426] Utils.pm:395> WARN - legacy month field 'Mar' in entry 'hubel_wiesel_1968' is not an integer - this will probably not sort properly.
+[429] Utils.pm:395> WARN - legacy month field 'Apr' in entry 'fukushima_1980' is not an integer - this will probably not sort properly.
+[443] Utils.pm:395> WARN - legacy month field 'Apr' in entry 'uijlings_van' is not an integer - this will probably not sort properly.
+[471] Utils.pm:395> WARN - BibTeX subsystem: C:\Users\drkzt\AppData\Local\Temp\biber_tmp_Wh6X\8fe4c9854184545302f21ebf0d47516c_38792.utf8, line 12, warning: 3 characters of junk seen at toplevel
+[471] Utils.pm:395> WARN - BibTeX subsystem: C:\Users\drkzt\AppData\Local\Temp\biber_tmp_Wh6X\8fe4c9854184545302f21ebf0d47516c_38792.utf8, line 34, warning: 6 characters of junk seen at toplevel
+[471] Utils.pm:395> WARN - BibTeX subsystem: C:\Users\drkzt\AppData\Local\Temp\biber_tmp_Wh6X\8fe4c9854184545302f21ebf0d47516c_38792.utf8, line 59, warning: 3 characters of junk seen at toplevel
+[471] Utils.pm:395> WARN - BibTeX subsystem: C:\Users\drkzt\AppData\Local\Temp\biber_tmp_Wh6X\8fe4c9854184545302f21ebf0d47516c_38792.utf8, line 71, warning: 3 characters of junk seen at toplevel
+[486] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[486] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[486] Biber.pm:4168> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'en-US'
+[486] Biber.pm:4174> INFO - No sort tailoring available for locale 'en-US'
+[497] bbl.pm:654> INFO - Writing 'main.bbl' with encoding 'UTF-8'
+[503] bbl.pm:757> INFO - Output to main.bbl
+[508] Biber.pm:128> INFO - WARNINGS: 7
