@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 
 
-im = cv2.imread("../work/week2/input.jpg")
+im = cv2.imread("../work/MCV_M5_VR_G04/week2/input.jpg")
 
 
 cfg = get_cfg()

@@ -63,7 +63,7 @@ def get_balloon_dicts(img_dir):
     return dataset_dicts
 
 for d in ["train", "val"]:
-    DatasetCatalog.register("balloon_" + d, lambda d=d: get_balloon_dicts("../work/week2/balloon/" + d))
+    DatasetCatalog.register("balloon_" + d, lambda d=d: get_balloon_dicts("../work/MCV_M5_VR_G04/week2/balloon/" + d))
     MetadataCatalog.get("balloon_" + d).set(thing_classes=["balloon"])
 balloon_metadata = MetadataCatalog.get("balloon_train")
 
@@ -93,7 +93,7 @@ cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")  # path to t
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
 predictor = DefaultPredictor(cfg)
 
-dataset_dicts = get_balloon_dicts("../work/week2/balloon/val")
+dataset_dicts = get_balloon_dicts("../work/MCV_M5_VR_G04/week2/balloon/val")
 for d in random.sample(dataset_dicts, 3):
     im = cv2.imread(d["file_name"])
     outputs = predictor(im)  # format is documented at https://detectron2.readthedocs.io/tutorials/models.html#model-output-format

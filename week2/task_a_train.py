@@ -67,7 +67,7 @@ for d in ["train", "val"]:
     MetadataCatalog.get("balloon_" + d).set(thing_classes=["balloon"])
 balloon_metadata = MetadataCatalog.get("balloon_train")
 
-dataset_dicts = get_balloon_dicts("../work/week2/balloon/train")
+dataset_dicts = get_balloon_dicts("../work/MCV_M5_VR_G04/week2/balloon/train")
 for d in random.sample(dataset_dicts, 3):
     img = cv2.imread(d["file_name"])
     visualizer = Visualizer(img[:, :, ::-1], metadata=balloon_metadata, scale=0.5)
