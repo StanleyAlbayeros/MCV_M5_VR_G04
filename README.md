@@ -26,5 +26,8 @@ Tasks:
 [Google Slides Week 2](https://docs.google.com/presentation/d/1NfX-RdEkfT6hhm7tppC3edqGNjgpXcKk_4eDAcbMviU/edit?usp=sharing)
 
 [Link to State of the Art PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/week2/Paper/main.pdf)
+
 [Link to State of the Art Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/week2/Paper)
+
 [Link to State of the Art Overleaf project](https://www.overleaf.com/project/604d81350cf6b14c73c264c0)
+
