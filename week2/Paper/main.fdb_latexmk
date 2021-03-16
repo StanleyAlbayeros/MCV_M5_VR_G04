@@ -1,11 +1,11 @@
 # Fdb version 3
-["biber main"] 1615764353 "main.bcf" "main.bbl" "main" 1615765863
+["biber main"] 1615764353 "main.bcf" "main.bbl" "main" 1615845371
   "Resources/refs.bib" 1615759517 2862 bd84790f6fd4344a897534a5d2aebe01 ""
-  "main.bcf" 1615765863 106537 8ffe0b15d21a278fb349f1d401be45f8 "pdflatex"
+  "main.bcf" 1615810914 106537 8ffe0b15d21a278fb349f1d401be45f8 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
-["pdflatex"] 1615765861 "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.tex" "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.pdf" "main" 1615765863
+["pdflatex"] 1615810912 "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.tex" "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.pdf" "main" 1615845371
   "C:/Users/drkzt/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1615747683 9407463 542063011c89a40f0b896b759ea6d3be ""
   "C:/Users/drkzt/AppData/Local/MiKTeX/pdftex/config/pdftex.map" 1615763906 82705 9cc9f144eacd499bc23a611703921467 ""
   "C:/Users/drkzt/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc" 1458473887 4993 80dc9bab7f31fb78a000ccfed0e27cab ""
@@ -115,17 +115,17 @@
   "Resources/Images/detr.png" 1615759228 95377 b35a873a0d7e50fe0f5d6d04cf0785fe ""
   "Resources/Images/object_detection.jpg" 1615743316 2317377 7249bf99c75f898a137b8665124e1d1f ""
   "Resources/Images/object_segmentation.jpg" 1615747889 167996 b7606eefd25f0e89efa668b4d24d3c61 ""
-  "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.aux" 1615765863 4237 22a89fb420ed981f9fa06c1f6ee80147 ""
-  "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.tex" 1615765860 11168 6f774eda5494e2a36e142ac422817b1b ""
-  "main.aux" 1615765863 4237 22a89fb420ed981f9fa06c1f6ee80147 "pdflatex"
+  "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.aux" 1615810914 4237 22a89fb420ed981f9fa06c1f6ee80147 ""
+  "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.tex" 1615810911 11168 6f774eda5494e2a36e142ac422817b1b ""
+  "main.aux" 1615810914 4237 22a89fb420ed981f9fa06c1f6ee80147 "pdflatex"
   "main.bbl" 1615764356 16805 08263c66c48b0787f280a7782178d6a4 "biber main"
-  "main.run.xml" 1615765863 2309 4c2d5189b0779fafbf007f047b6b1fcd "pdflatex"
-  "main.tex" 1615765860 11168 6f774eda5494e2a36e142ac422817b1b ""
+  "main.run.xml" 1615810914 2309 4c2d5189b0779fafbf007f047b6b1fcd "pdflatex"
+  "main.tex" 1615810911 11168 6f774eda5494e2a36e142ac422817b1b ""
   (generated)
-  "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.pdf"
+  "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.log"
   "main.aux"
   "main.log"
+  "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.pdf"
   "main.bcf"
-  "d:/Classes/Master/M5/MCV_M5_VR_G04/week2/Paper/main.log"
   "main.pdf"
   "main.run.xml"
