@@ -131,8 +131,7 @@ dmypy.json
 
 
 # datasets
-week2/balloon
-week2/__MACOSX
-week2/venv
-resources/KITTI-MOTS/
-resources/MOTSChallenge/
+datasets/
+
+# job foldfer
+jobs/
