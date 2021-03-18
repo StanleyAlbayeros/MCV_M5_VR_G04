@@ -131,6 +131,7 @@ dmypy.json
 
 
 # datasets
-week2/balloon
-week2/__MACOSX
-week2/venv
+datasets/
+
+# job foldfer
+jobs/
