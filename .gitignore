@@ -135,3 +135,5 @@ datasets/
 
 # job foldfer
 jobs/
+resources/KITTI-MOTS/
+resources/MOTSChallenge/
