@@ -24,11 +24,17 @@ from detectron2.structures import BoxMode
 
 from detectron2.utils.visualizer import ColorMode
 
-LOCAL_RUN = False
+LOCAL_RUN = True
 DATA_TEST_PATH = "../datasets/KITTI-MOTS/testing/image_02"
-
 if LOCAL_RUN:
     DATA_TEST_PATH = "../resources/KITTI-MOTS/testing/image_02"
+
+
+
+OUTPUT_PATH = "outputs/b_retinaNet"
+
+if not os.path.exists(OUTPUT_PATH):
+    os.makedirs(OUTPUT_PATH)
 
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
