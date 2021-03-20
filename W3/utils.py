@@ -20,3 +20,22 @@ def draw_text(img, text,
                 font, font_scale, text_color, font_thickness, )
     cv2.addWeighted(overlay, alpha, output, 1 - alpha, 0, output)
     return output
+
+
+def write_text_two(img50, img101):
+    txt_font = cv2.FONT_HERSHEY_PLAIN
+    fontsize = 5
+    fontcolor = (255,0,255)
+    bg_color = (200,200,200)
+    fontthickness = 3
+    txtSize = cv2.getTextSize("0000", txt_font, fontsize, fontthickness)[0]
+    margin = 10
+    textX = img101.shape[1] - (txtSize[0])- margin
+    textY = margin
+    coords = (textX,textY)
+    # print(coords)
+    
+
+    img50 = draw_text(img50, "R50", txt_font, coords, fontsize, fontthickness, fontcolor, bg_color)
+    img101 = draw_text(img101, "R101", txt_font, coords, fontsize, fontthickness, fontcolor, bg_color)
+    return img50, img101

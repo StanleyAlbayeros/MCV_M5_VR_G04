@@ -24,7 +24,7 @@ from detectron2.structures import BoxMode
 
 from detectron2.utils.visualizer import ColorMode
 
-import util
+import utils
 
 LOCAL_RUN = True
 DATA_TEST_PATH = "../datasets/KITTI-MOTS/testing/image_02"
@@ -56,24 +56,6 @@ predictor = DefaultPredictor(rcnnR101)
 
 
 
-def write_text(img50, img101):
-    txt_font = cv2.FONT_HERSHEY_PLAIN
-    fontsize = 5
-    fontcolor = (255,0,255)
-    bg_color = (200,200,200)
-    fontthickness = 3
-    txtSize = cv2.getTextSize("0000", txt_font, fontsize, fontthickness)[0]
-    margin = 10
-    textX = img101.shape[1] - (txtSize[0])- margin
-    textY = margin
-    coords = (textX,textY)
-    # print(coords)
-    
-
-    img50 = util.draw_text(img50, "R50", txt_font, coords, fontsize, fontthickness, fontcolor, bg_color)
-    img101 = util.draw_text(img101, "R101", txt_font, coords, fontsize, fontthickness, fontcolor, bg_color)
-    return img50, img101
-
 for category_folder in os.listdir(DATA_TEST_PATH):
     total_outputs = 1
     for filename in random.sample(os.listdir(DATA_TEST_PATH + "/" + category_folder),3):
@@ -93,7 +75,7 @@ for category_folder in os.listdir(DATA_TEST_PATH):
         img50 = np.array(out50.get_image()[:, :, ::-1])
         img101 = np.array(out101.get_image()[:, :, ::-1])
 
-        img50, img101 = write_text(img50, img101)
+        img50, img101 = utils.write_text_two(img50, img101)
         
         imgstack = np.vstack([img50, img101]) 
         cv2.imwrite(f"{OUTPUT_PATH}/{category_folder}_{filename}.png", imgstack) 
