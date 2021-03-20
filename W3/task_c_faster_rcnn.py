@@ -31,14 +31,6 @@ from tqdm import tqdm
 
 
 """
-Calculate of IoU (move to utils file)
-"""
-
-def getIoU(predicted_bbox,gt_bbox):
-    iou = ""
-    return iou
-
-"""
 Obtención de las boxes de cada imagen
 """
 def get_dicts(path):
