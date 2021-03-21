@@ -90,11 +90,11 @@ cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_F
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
+
 predictor = DefaultPredictor(cfg)
 
-for d in ["train"]:
-    DatasetCatalog.register("kitti-mots_"+d, lambda d=d: get_dicts(BASE_PATH))
-    MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Pedestrian","Car"])
+DatasetCatalog.register("kitti-mots_train", lambda d="train": get_dicts(BASE_PATH))
+MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Pedestrian", "Car"])
 kitti_mots_metadata = MetadataCatalog.get("kitti-mots_train")
 
 dataset_dicts = get_dicts(BASE_PATH)
@@ -110,5 +110,5 @@ for rand in random.sample(dataset_dicts, 1):
 
 evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./output/")
 val_loader = build_detection_test_loader(cfg, "kitti-mots_train")
-print(inference_on_dataset(trainer.model, val_loader, evaluator))
+print(inference_on_dataset(predictor.model, val_loader, evaluator))
 
