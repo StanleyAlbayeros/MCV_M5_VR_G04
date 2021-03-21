@@ -26,51 +26,10 @@ from detectron2.utils.visualizer import ColorMode
 
 from PIL import Image
 import io_tools
-import pycocotools
-from tqdm import tqdm
+import getDicts
 
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.data import build_detection_test_loader
-
-
-"""
-Obtención de las boxes de cada imagen
-"""
-def get_dicts(path):
-    raw_dicts = []
-    dataset_dicts = []
-    Pedestrians = []
-    Cars =[]
-    for file in sorted(os.listdir(path + "/instances_txt")):
-        annotations = io_tools.load_txt(path + "/instances_txt/" + file)
-        raw_dicts.append(annotations)
-    for idx, dicts in tqdm(enumerate(raw_dicts)):
-        for key,value in dicts.items():
-            record = {}
-            img_id = str(key).zfill(6)
-            img_path = os.path.join(IMG_PATH,str(idx).zfill(4),str(img_id)+".png")
-            img = cv2.imread(img_path)
-            height,width,channels = img.shape
-
-            record["file_name"] = img_path
-            record["image_id"] = img_id
-            record["height"] = height
-            record["width"] = width
-            objs = []
-            for instance in value:
-                category_id = instance.class_id
-                if category_id == 1 or category_id == 2:
-                    bbox = pycocotools.mask.toBbox(instance.mask)
-                    obj = {
-                        "bbox": [float(bbox[0]),float(bbox[1]),float(bbox[2]),float(bbox[3])],
-                        "bbox_mode": BoxMode.XYWH_ABS,
-                        "category_id": category_id,
-                    }
-                    objs.append(obj)
-            record["annotations"] = objs
-            dataset_dicts.append(record)
-
-    return dataset_dicts
 
 
 LOCAL_RUN = False
@@ -93,22 +52,22 @@ cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_5
 predictor = DefaultPredictor(cfg)
 
 for d in ["train"]:
-    DatasetCatalog.register("kitti-mots_"+d, lambda d=d: get_dicts(BASE_PATH))
-    MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Pedestrian","Car"])
+    DatasetCatalog.register("kitti-mots_"+d, lambda d=d: getDicts.get_dicts(BASE_PATH,IMG_PATH))
+    MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Car","Pedestrian"])
 kitti_mots_metadata = MetadataCatalog.get("kitti-mots_train")
 
-dataset_dicts = get_dicts(BASE_PATH)
+dataset_dicts = getDicts.get_dicts(BASE_PATH,IMG_PATH)
 
 for rand in random.sample(dataset_dicts, 1):
-    img = cv2.imread(rand["file_name"])
-    visualizer = Visualizer(img[:, :, ::-1], metadata=kitti_mots_metadata, scale=0.5)
-    out = visualizer.draw_dataset_dict(rand)
-    plt.imshow(out.get_image()[:, :, ::-1])
-    plt.show()
-    cv2.imwrite("out_kittimotts_faster_rcnn.png", out.get_image()[:, :, ::-1])
+        img = cv2.imread(rand["file_name"])
+        visualizer = Visualizer(img[:, :, ::-1], metadata=kitti_mots_metadata, scale=0.5)
+        out = visualizer.draw_dataset_dict(rand)
+        plt.imshow(out.get_image()[:, :, ::-1])
+        plt.show()
+        cv2.imwrite("out_kittimotts_faster_rcnn.png", out.get_image()[:, :, ::-1])
 
 
-evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./output/")
+"""evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./output/")
 val_loader = build_detection_test_loader(cfg, "kitti-mots_train")
-print(inference_on_dataset(trainer.model, val_loader, evaluator))
+print(inference_on_dataset(trainer.model, val_loader, evaluator))"""
 
