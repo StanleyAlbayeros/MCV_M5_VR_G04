@@ -94,7 +94,6 @@ cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_5
 predictor = DefaultPredictor(cfg)
 
 DatasetCatalog.register("kitti-mots_train", lambda d="train": get_dicts(BASE_PATH))
-MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Pedestrian", "Car"])
 kitti_mots_metadata = MetadataCatalog.get("kitti-mots_train")
 
 dataset_dicts = get_dicts(BASE_PATH)
