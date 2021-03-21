@@ -34,9 +34,18 @@ from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.data import build_detection_test_loader
 
 LOCAL_RUN = False
+"""
 IMG_PATH = "../datasets/KITTI-MOTS/training/image_02"
 LABEL_PATH = "../datasets/KITTI-MOTS/instances_txt"
 BASE_PATH = "../datasets/KITTI-MOTS/"
+"""
+
+
+IMG_PATH = "../datasets/MOTSChallenge/train/images"
+LABEL_PATH = "../datasets/MOTSChallenge/train/instances_txt"
+BASE_PATH = "../datasets/MOTSChallenge/train/"
+
+
 
 if LOCAL_RUN:
     IMG_PATH = "../resources/KITTI-MOTS/training/image_02"
@@ -44,9 +53,16 @@ if LOCAL_RUN:
     BASE_PATH = "../resources/KITTI-MOTS/"
 
 
-for d in ["train"]:
-    DatasetCatalog.register("kitti-mots_"+d, lambda d=d: getDicts.get_dicts(BASE_PATH,IMG_PATH))
-    MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Car","Pedestrian"])
+
+dataset_dicts = getDicts.get_dicts(BASE_PATH,IMG_PATH,".jpg")
+train,val,test = getDicts.split_data(dataset_dicts)
+
+
+DatasetCatalog.register("kitti-mots_train", lambda d="train": train)
+MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Car","Pedestrian"])
+DatasetCatalog.register("kitti-mots_val", lambda d="val": val)
+MetadataCatalog.get("kitti-mots_val").set(thing_classes=["Car", "Pedestrian"])
+kitti_mots_metadata = MetadataCatalog.get("kitti-mots_val")
 
 kitti_mots_metadata = MetadataCatalog.get("kitti-mots_train")
 
@@ -77,16 +93,14 @@ cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
 predictor = DefaultPredictor(cfg)
 
 
-"""dataset_dicts = getDicts.get_dicts(BASE_PATH,IMG_PATH)
-
-for rand in random.sample(dataset_dicts, 1):
-    img = cv2.imread(rand["file_name"])
+for rand_image in random.sample(val, 1):
+    img = cv2.imread(rand_image["file_name"])
     visualizer = Visualizer(img[:, :, ::-1], metadata=kitti_mots_metadata, scale=0.5)
-    out = visualizer.draw_dataset_dict(rand)
+    out = visualizer.draw_dataset_dict(rand_image)
     plt.imshow(out.get_image()[:, :, ::-1])
     plt.show()
-    cv2.imwrite("out_kittimotts_faster_rcnn.png", out.get_image()[:, :, ::-1])"""
+    cv2.imwrite("out_motschallenge_faster_rcnn_task_d.png", out.get_image()[:, :, ::-1])
 
-evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./output/")
-val_loader = build_detection_test_loader(cfg, "kitti-mots_train")
+evaluator = COCOEvaluator("kitti-mots_val", cfg, False, output_dir="./output/")
+val_loader = build_detection_test_loader(cfg, "kitti-mots_val")
 print(inference_on_dataset(trainer.model, val_loader, evaluator))

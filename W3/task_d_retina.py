@@ -86,7 +86,7 @@ if LOCAL_RUN:
 
 for d in ["train"]:
     DatasetCatalog.register("kitti-mots_"+d, lambda d=d: get_dicts(BASE_PATH))
-    MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Pedestrian","Car"])
+    MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Car","Pedestrian"])
 
 kitti_mots_metadata = MetadataCatalog.get("kitti-mots_train")
 
@@ -119,15 +119,15 @@ predictor = DefaultPredictor(cfg)
 
 dataset_dicts = get_dicts(BASE_PATH)
 
-for rand in random.sample(dataset_dicts, 1):
+for rand_image in random.sample(dataset_dicts, 1):
     img = cv2.imread(rand["file_name"])
     visualizer = Visualizer(img[:, :, ::-1], metadata=kitti_mots_metadata, scale=0.5)
-    print(rand)
-    out = visualizer.draw_dataset_dict(rand)
+    print(rand_image)
+    out = visualizer.draw_dataset_dict(rand_image)
     plt.imshow(out.get_image()[:, :, ::-1])
     plt.show()
     cv2.imwrite("out_kittimotts_faster_rcnn.png", out.get_image()[:, :, ::-1])
 
-evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./output/")
+"""evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./output/")
 val_loader = build_detection_test_loader(cfg, "kitti-mots_train")
-print(inference_on_dataset(trainer.model, val_loader, evaluator))
+print(inference_on_dataset(trainer.model, val_loader, evaluator))"""

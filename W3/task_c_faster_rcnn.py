@@ -37,6 +37,13 @@ IMG_PATH = "../datasets/KITTI-MOTS/training/image_02"
 LABEL_PATH = "../datasets/KITTI-MOTS/instances_txt"
 BASE_PATH = "../datasets/KITTI-MOTS/"
 
+
+"""
+IMG_PATH = "../datasets/MOTSChallenge/train/images"
+LABEL_PATH = "../datasets/MOTSChallenge/train/instances_txt"
+BASE_PATH = "../datasets/MOTSChallenge/train/"
+"""
+
 if LOCAL_RUN:
     IMG_PATH = "../resources/KITTI-MOTS/training/image_02"
     LABEL_PATH = "../resources/KITTI-MOTS/instances_txt"
@@ -52,23 +59,27 @@ cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_5
 
 predictor = DefaultPredictor(cfg)
 
-for d in ["train"]:
-    DatasetCatalog.register("kitti-mots_"+d, lambda d=d: getDicts.get_dicts(BASE_PATH,IMG_PATH))
-    MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Car","Pedestrian"])
-kitti_mots_metadata = MetadataCatalog.get("kitti-mots_train")
-
 dataset_dicts = getDicts.get_dicts(BASE_PATH,IMG_PATH)
+train,val,test = getDicts.split_data(dataset_dicts)
 
-for rand in random.sample(dataset_dicts, 1):
+
+DatasetCatalog.register("kitti-mots_train", lambda d="train": train)
+MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Car","Pedestrian"])
+DatasetCatalog.register("kitti-mots_val", lambda d="val": val)
+MetadataCatalog.get("kitti-mots_val").set(thing_classes=["Car", "Pedestrian"])
+kitti_mots_metadata = MetadataCatalog.get("kitti-mots_val")
+
+
+for rand in random.sample(val, 1):
         img = cv2.imread(rand["file_name"])
         visualizer = Visualizer(img[:, :, ::-1], metadata=kitti_mots_metadata, scale=0.5)
         out = visualizer.draw_dataset_dict(rand)
         plt.imshow(out.get_image()[:, :, ::-1])
         plt.show()
-        cv2.imwrite("out_kittimotts_faster_rcnn.png", out.get_image()[:, :, ::-1])
+        cv2.imwrite("out_kittimots_faster_rcnn_task_c.png", out.get_image()[:, :, ::-1])
 
 
-evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./output/")
-val_loader = build_detection_test_loader(cfg, "kitti-mots_train")
+evaluator = COCOEvaluator("kitti-mots_val", cfg, False, output_dir="./output/")
+val_loader = build_detection_test_loader(cfg, "kitti-mots_val")
 print(inference_on_dataset(predictor.model, val_loader, evaluator))
 
