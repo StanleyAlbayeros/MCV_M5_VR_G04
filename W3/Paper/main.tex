@@ -258,7 +258,7 @@ a quantitative analysis of the results.
 For training, validation and test splits, we used $60\%$ of the dataset as training, $20\%$
 as validation, and $20\%$ as test. 
 Our testing parameters were learning rate = {0.0001, 0.001, 0.01}, 
-proposed regions = {32,64,128} at 1000 iterations.
+ROI proposals = {32,64,128} at 1000 iterations.
 
 We were able to collect data for the RCNN model 
 (Table \ref{table:RCNN_Table_training}), but 
@@ -271,7 +271,7 @@ decrease, and were not included in the table.
     \centering
     \begin{tabular}{|c | c || c|} 
         \hline
-        \textbf{LR} & \textbf{Regions} & \textbf{$AP_{(50)}$} \\ [0.8ex] 
+        \textbf{LR} & \textbf{ROIs} & \textbf{$AP_{(50)}$} \\ [0.8ex] 
             \hline
             0.0001 & 32 & 0.236 \\ 
             \hline
@@ -298,7 +298,7 @@ decrease, and were not included in the table.
 \subsection{Task E: Evaluate trained model on KITTI-MOTS test set.}
 
 For this last task, we took the best performing model of the last section and used
-it on the official KITTI-MOTS test set. For this, the LR = 0.001, Regions=128 
+it on the official KITTI-MOTS test set. For this, the LR = 0.001, ROI Batch=128 
 trained model was selected. 
 
 
