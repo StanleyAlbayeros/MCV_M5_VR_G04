@@ -178,7 +178,7 @@ Seeing how previous approaches to object detection have to deal with post-proces
 
 As a baseline architecture proposal, DETR seeks to match the performance of Faster R-CNN pipelines. According to the DETR paper, the new transformer-based architecture(Fig. 3) generally outperforms Faster R-CNN, except when there are many small objects, where it obtains a worse performance.
 
-\section{Using pre-trained models on new datasets}
+\section{Week 3: Using pre-trained models on new datasets}
 
 On week 3 of the M5 module, we are tasked to perform several experiments using 
 the popular faster R-CNN and RetinaNet pre-trained models on two popular
@@ -188,7 +188,7 @@ following sections.
 \subsection{Task A}
 
 For task A, we needed to take a look at the datasets we would use on the 
-following experiments. The MOTSCHallenge dataset involves a series of 
+following experiments. The MOTSChallenge dataset involves a series of 
 photographs of urban scenarios with several people on the frame,
 identified with the "Pedestrian" class, and corresponding bounding boxes
 for the ground truth annotations. The KITTI-MOTS dataset, augments the
@@ -211,18 +211,18 @@ model for RetinaNet (Fig. \ref{fig:r50retina}).
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.8\linewidth]{Resources/Images/r50r101.png}
-    \caption{RCNN tests}
+    \caption{RCNN samples.}
     \label{fig:r50r101}
     \end{figure}
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.8\linewidth]{Resources/Images/r50retina.png}
-    \caption{Retina Tests}
+    \caption{RetinaNet samples.}
     \label{fig:r50retina}
     \end{figure}
 
-\subsection{Task C:Quantitative analysis of pre-trained models.}
+\subsection{Task C: Quantitative analysis of pre-trained models.}
 
 After last section's qualitative analysis, we are tasked with evaluating
 quantitatively how these models perform on the validation of the KITTI-MOTS dataset. We used 
@@ -233,17 +233,95 @@ overall model performance and per-class performance (Table \ref{table:KITTI_Tabl
     \centering
     \begin{tabular}{|c || c | c|} 
         \hline
-          & R-CNN & RetinaNet \\ [0.8ex] 
+          & \textbf{R-CNN} & \textbf{RetinaNet} \\ [0.8ex] 
           \hline
-         $AP_{(50)}$ & 0.572 & 0.461  \\ 
+         $AP_{(50)}$ & 0.415 & 0.461  \\ 
          \hline
-         $AP_{(50)}$ Car & 0.599 & 0.553 \\
+         $AP_{(50)}$ Car & 0.576 & 0.553 \\
          \hline
-         $AP_{(50)}$ Pedestrian & 0.456 & 0.337 \\
+         $AP_{(50)}$ Pedestrian & 0.456 & 0.397 \\
          \hline
     \end{tabular}
-    \caption{\label{table:KITTI_Table1}$AP_{(50)}$ on KITTI-MOTS validation.}
+    \caption{\label{table:KITTI_Table1}Pre-trained $AP_{(50)}$ on KITTI-MOTS validation.}
 \end{table}
+
+Both models preform very well for Car objects, but the pedestrian class
+represents a problem for their performance, especially on RetinaNet
+which takes a larger nosedive in performance when trying to identify pedestrians
+than RCNN.
+
+\subsection{Task D: Quantitative analysis of models after training on new datasets.}
+
+For task D we needed to train RCNN and RetinaNet on the datasets and provide
+a quantitative analysis of the results. 
+
+For training, validation and test splits, we used $60\%$ of the dataset as training, $20\%$
+as validation, and $20\%$ as test. 
+Our testing parameters were learning rate = {0.0001, 0.001, 0.01}, 
+proposed regions = {32,64,128} at 1000 iterations.
+
+We were able to collect data for the RCNN model 
+(Table \ref{table:RCNN_Table_training}), but 
+all our experiments for RetinaNet gave us much lower results when compared to the pre-trained
+models used in the previous section, which in all probability means that we could not
+implement our test cycle properly for RetinaNet. The results were beyond a -15\% performance
+decrease, and were not included in the table. 
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c | c || c|} 
+        \hline
+        \textbf{LR} & \textbf{Regions} & \textbf{$AP_{(50)}$} \\ [0.8ex] 
+            \hline
+            0.0001 & 32 & 0.236 \\ 
+            \hline
+            0.0001 & 64 & 0.371\\ 
+            \hline
+            0.0001 & 128 & 0.394 \\ 
+            \hline
+            0.001 & 32 & 0.410\\ 
+            \hline
+            0.001 & 64 & 0.467\\ 
+            \hline
+            \textbf{0.001} & \textbf{128} & \textbf{0.572}\\ 
+            \hline
+            0.01 & 32 & 0.365\\ 
+            \hline
+            0.01 & 64 & 0.379\\ 
+            \hline
+            0.01 & 128 & 0.426\\ 
+         \hline
+    \end{tabular}
+    \caption{\label{table:RCNN_Table_training}RCNN Training.}
+\end{table}
+
+\subsection{Task E: Evaluate trained model on KITTI-MOTS test set.}
+
+For this last task, we took the best performing model of the last section and used
+it on the official KITTI-MOTS test set. For this, the LR = 0.001, Regions=128 
+trained model was selected. 
+
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c || c |} 
+        \hline
+          & \textbf{R-CNN}\\ [0.8ex] 
+          \hline
+         $AP_{(50)}$ & 0.331\\ 
+         \hline
+         $AP_{(50)}$ Car & 0.421\\
+         \hline
+         $AP_{(50)}$ Pedestrian & 0.367\\
+         \hline
+    \end{tabular}
+    \caption{\label{table:KITTI-MOTS-FINAL}Final model $AP_{(50)}$ on KITTI-MOTS validation.}
+\end{table}
+
+As we can see in table \ref{table:KITTI-MOTS-FINAL}, our results are noticeably 
+worse than the pre-trained model's results, even though we outperformed 
+the pre-trained model on our train-validation-testing split. We suspect that this is due
+to the images in the test set beneffiting from a higher region count for this model.
 
 \printbibliography
 \end{document}
