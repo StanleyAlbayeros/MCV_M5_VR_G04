@@ -25,7 +25,7 @@ def get_dicts(base_path,images_path,extension=".png"):
             record = {}
             img_id = str(key).zfill(6)
             img_path = os.path.join(images_path,folder_id[idx].zfill(4),str(img_id)+extension)
-            print(img_path)
+            # print(img_path)
             img = cv2.imread(img_path)
             height,width,channels = img.shape
 

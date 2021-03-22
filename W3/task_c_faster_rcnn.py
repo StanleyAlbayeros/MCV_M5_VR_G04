@@ -26,13 +26,14 @@ from detectron2.utils.visualizer import ColorMode
 
 from PIL import Image
 import io_tools
+import utils
 import getDicts
 
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.data import build_detection_test_loader
 
 
-LOCAL_RUN = False
+LOCAL_RUN = True
 IMG_PATH = "../datasets/KITTI-MOTS/training/image_02"
 LABEL_PATH = "../datasets/KITTI-MOTS/instances_txt"
 BASE_PATH = "../datasets/KITTI-MOTS/"
@@ -49,37 +50,28 @@ if LOCAL_RUN:
     LABEL_PATH = "../resources/KITTI-MOTS/instances_txt"
     BASE_PATH = "../resources/KITTI-MOTS/"
 
-
-cfg = get_cfg()
-# add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
-cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
-# Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
-cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
-
-predictor = DefaultPredictor(cfg)
+MODEL_IN_USE = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
 
 dataset_dicts = getDicts.get_dicts(BASE_PATH,IMG_PATH)
 train,val,test = getDicts.split_data(dataset_dicts)
+
+cfg = get_cfg()
+cfg.merge_from_file(model_zoo.get_config_file(MODEL_IN_USE))
+cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(MODEL_IN_USE)
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5 
+
 
 
 DatasetCatalog.register("kitti-mots_train", lambda d="train": train)
 MetadataCatalog.get("kitti-mots_train").set(thing_classes=["Car","Pedestrian"])
 DatasetCatalog.register("kitti-mots_val", lambda d="val": val)
 MetadataCatalog.get("kitti-mots_val").set(thing_classes=["Car", "Pedestrian"])
-kitti_mots_metadata = MetadataCatalog.get("kitti-mots_val")
+kitti_mots_metadata = MetadataCatalog.get("kitti-mots_train")
 
 
-for rand in random.sample(val, 1):
-        img = cv2.imread(rand["file_name"])
-        visualizer = Visualizer(img[:, :, ::-1], metadata=kitti_mots_metadata, scale=0.5)
-        out = visualizer.draw_dataset_dict(rand)
-        plt.imshow(out.get_image()[:, :, ::-1])
-        plt.show()
-        cv2.imwrite("out_kittimots_faster_rcnn_task_c.png", out.get_image()[:, :, ::-1])
 
+predictor = DefaultPredictor(cfg)
 
 evaluator = COCOEvaluator("kitti-mots_val", cfg, False, output_dir="./output/")
 val_loader = build_detection_test_loader(cfg, "kitti-mots_val")
 print(inference_on_dataset(predictor.model, val_loader, evaluator))
-

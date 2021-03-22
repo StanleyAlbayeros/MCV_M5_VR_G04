@@ -44,7 +44,7 @@ rcnnR50.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_
 rcnnR50.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 rcnnR50.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
-predictor = DefaultPredictor(rcnnR50)
+predictor50 = DefaultPredictor(rcnnR50)
 
 rcnnR101 = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
@@ -52,21 +52,22 @@ rcnnR101.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_X
 rcnnR101.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 rcnnR101.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml")
-predictor = DefaultPredictor(rcnnR101)
+predictor101 = DefaultPredictor(rcnnR101)
 
 
-
+i=0
 for category_folder in os.listdir(DATA_TEST_PATH):
-    total_outputs = 1
+    utils.print_percent_done(i, len(next(os.walk(DATA_TEST_PATH))[1]))
+    i += 1
     for filename in random.sample(os.listdir(DATA_TEST_PATH + "/" + category_folder),3):
 
-        print("validation image: "+DATA_TEST_PATH + "/" + category_folder + "/" + filename)
+        # print("validation image: "+DATA_TEST_PATH + "/" + category_folder + "/" + filename)
 
         im50 = cv2.imread(DATA_TEST_PATH+"/"+category_folder+"/"+filename)
         im101 = cv2.imread(DATA_TEST_PATH+"/"+category_folder+"/"+filename)
 
-        outputsr50 = predictor(im50)
-        outputsr101 = predictor(im101)
+        outputsr50 = predictor50(im50)
+        outputsr101 = predictor101(im101)
         
         v50 = Visualizer(im50[:, :, ::-1], MetadataCatalog.get(rcnnR50.DATASETS.TRAIN[0]), scale=1.2)
         v101 = Visualizer(im101[:, :, ::-1], MetadataCatalog.get(rcnnR101.DATASETS.TRAIN[0]), scale=1.2)
@@ -75,12 +76,7 @@ for category_folder in os.listdir(DATA_TEST_PATH):
         img50 = np.array(out50.get_image()[:, :, ::-1])
         img101 = np.array(out101.get_image()[:, :, ::-1])
 
-        img50, img101 = utils.write_text_two(img50, img101)
+        img50, img101 = utils.write_text_two(img50, img101, "R50", "R101")
         
         imgstack = np.vstack([img50, img101]) 
-        cv2.imwrite(f"{OUTPUT_PATH}/{category_folder}_{filename}.png", imgstack) 
-        
-        #closing all open windows
-        total_outputs = total_outputs- 1
-        if total_outputs==0:
-            break
+        cv2.imwrite(f"{OUTPUT_PATH}/{category_folder}_{filename}.png", imgstack)

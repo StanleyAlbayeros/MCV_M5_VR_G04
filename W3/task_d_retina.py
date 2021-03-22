@@ -73,7 +73,7 @@ def get_dicts(path):
     return dataset_dicts
 
 
-LOCAL_RUN = False
+LOCAL_RUN = True
 IMG_PATH = "../datasets/KITTI-MOTS/training/image_02"
 LABEL_PATH = "../datasets/KITTI-MOTS/instances_txt"
 BASE_PATH = "../datasets/KITTI-MOTS/"
@@ -128,6 +128,6 @@ for rand_image in random.sample(dataset_dicts, 1):
     plt.show()
     cv2.imwrite("out_kittimotts_faster_rcnn.png", out.get_image()[:, :, ::-1])
 
-"""evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./output/")
+"""evaluator = COCOEvaluator("kitti-mots_train", cfg, False, output_dir="./outputs/")
 val_loader = build_detection_test_loader(cfg, "kitti-mots_train")
 print(inference_on_dataset(trainer.model, val_loader, evaluator))"""
