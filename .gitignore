@@ -135,6 +135,9 @@ datasets/
 
 # job foldfer
 jobs/
+resources/KITTI/
+resources/vKITTI/
+resources/Cityscapes/
 resources/KITTI-MOTS/
 resources/MOTSChallenge/
 W3/outputs/
