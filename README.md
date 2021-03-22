@@ -27,7 +27,7 @@ Tasks:
 
 [Read State of the Art PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/week2/Paper/main.pdf)
 
-[Read State of the Art Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/week2/Paper)
+[Go to State of the Art Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/week2/Paper)
 
 [Go to State of the Art Overleaf project](https://www.overleaf.com/project/604d81350cf6b14c73c264c0)
 
@@ -43,10 +43,11 @@ Tasks:
 - Evaluate the performance of the best model obtained on the previous task using the KITTI-MOTS validation set. 🆗
 - Add results to the paper. 🆗
 
-[Google Slides Week 3](https://docs.google.com/presentation/d/1NfX-RdEkfT6hhm7tppC3edqGNjgpXcKk_4eDAcbMviU/edit?usp=sharing)
+[Google Slides Week 3](https://docs.google.com/presentation/d/1JKVbm9Tztlk-SESG7gn2FduVvTWEP960Zw-zi0LfaD4/edit?pli=1#slide=id.g7134b6a41c_0_0)
+(We filled in the slides linked in the instructions PDF)
 
-[Read updated PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/week2/Paper/main.pdf)
+[Read updated PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/W3/Paper/main.pdf)
 
-[Read updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/week2/Paper)
+[Go to updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/W3/Paper)
 
 [Go to paper's Overleaf project](https://www.overleaf.com/project/604d81350cf6b14c73c264c0)
