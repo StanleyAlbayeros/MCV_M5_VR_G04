@@ -1,6 +1,9 @@
 import getDicts
 import argparse
-
+import matplotlib.pyplot as plt
+import pycocotools.mask as rletools
+import cv2
+import os
 
 def init_path_vars(local_run: bool = False):
     global db_path
@@ -29,5 +32,13 @@ if __name__ == "__main__":
     local = parser.local
     init_path_vars(local)
 
-    data = getDicts.getMask(masks_path,imgs_path)
-    #data = getDicts.get_dicts(db_path,imgs_path,masks_path)
+    #data = getDicts.getMask(masks_path,imgs_path)
+    """data = getDicts.get_dicts(db_path,imgs_path,masks_path)
+    img = cv2.imread(os.path.join(masks_path,"0000/000000.png"))
+    for d in data:
+        for s in d["annotations"]:
+            for c in s["segmentation"]:
+                cv2.drawContours(img, c, -1, (255, 0, 0), 3)"""
+    train,val = getDicts.split_data_kitti_motts(db_path)
+    data_train = getDicts.get_dicts(train,imgs_path,masks_path)
+    print(data_train)
