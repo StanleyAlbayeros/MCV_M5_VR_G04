@@ -7,6 +7,7 @@ import io_tools
 import pycocotools
 from tqdm import tqdm
 from detectron2.structures import BoxMode
+import colorama
 import pycocotools.mask as rletools
 import pickle
 
@@ -42,12 +43,13 @@ def get_dicts(dataset,images_path,masks_path,extension=".png"):
         annotations = io_tools.load_txt(base_path + "/instances_txt/" + file)
         raw_dicts.append(annotations)
         folder_id.append(file[:-4])"""
-    for folder,annos in dataset.items():
-        for anno in annos:
+    for folder,annos in tqdm(dataset.items(), desc='Folder loop', colour="Red"):
+        for key, anno in tqdm(annos.items(), desc='Annons loop', colour="Blue"):
+            # print(key)
             record = {}
-            img_id = str(anno).zfill(6)
+            img_id = str(key).zfill(6)
             img_path = os.path.join(images_path,folder,str(img_id)+extension)
-            print(anno)
+            # print(img_path)
             img = cv2.imread(img_path)
             height,width,channels = img.shape
 
@@ -57,7 +59,7 @@ def get_dicts(dataset,images_path,masks_path,extension=".png"):
             record["width"] = width
             objs = []
 
-            for instance in anno.items():
+            for instance in anno:
 
                 category_id = instance.class_id
 
@@ -94,8 +96,8 @@ def get_dicts(dataset,images_path,masks_path,extension=".png"):
                     objs.append(obj)
             record["annotations"] = objs
             dataset_dicts.append(record)
-            break
-        break
+            # break
+        # break
     return dataset_dicts
 
 
