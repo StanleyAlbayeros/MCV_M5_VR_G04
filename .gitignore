@@ -141,3 +141,4 @@ resources/Cityscapes/
 resources/KITTI-MOTS/
 resources/MOTSChallenge/
 W3/outputs/
+detectron2/
