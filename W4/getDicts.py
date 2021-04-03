@@ -13,9 +13,20 @@ from tqdm import tqdm
 
 import io_tools
 
+"""
+Save catalogues to pkl
+"""
+
 
 def catalog_to_pkl(catalog, name):
-    with open(f"datasetpkl/{name}.pkl", 'wb') as f:
+    with open(f"datasetpkl/{name}.pkl", "wb") as f:
+        catalog = pickle.load(f)
+        f.close()
+    return catalog
+
+
+def pkl_to_catalog(catalog, name):
+    with open(f"datasetpkl/{name}.pkl", "wb") as f:
         pickle.dump(catalog, f)
         f.close()
 
@@ -23,8 +34,10 @@ def catalog_to_pkl(catalog, name):
 """
 Split para train i val
 """
-def split_data_kitti_motts(base_path, images_path ,extension=".png"):
-    training = ["2","6","7","8","10","13","14","16","18"]
+
+
+def split_data_kitti_motts(base_path, images_path, extension=".png"):
+    training = ["2", "6", "7", "8", "10", "13", "14", "16", "18"]
     training = np.char.zfill(training, 4)
     raw_dicts = []
     train_dataset = {}
@@ -34,37 +47,39 @@ def split_data_kitti_motts(base_path, images_path ,extension=".png"):
         if file[0:-4] in training:
             train_dataset[f"{file[0:-4]}"] = annotations
         else:
-            val_dataset[f"{file[0:-4]}"] =  annotations
+            val_dataset[f"{file[0:-4]}"] = annotations
 
-    train_catalog = get_dicts(train_dataset,images_path, extension)
+    train_catalog = get_dicts(train_dataset, images_path, extension)
     catalog_to_pkl(train_catalog, "train")
 
-    val_catalog = get_dicts(val_dataset,images_path, extension)
+    val_catalog = get_dicts(val_dataset, images_path, extension)
     catalog_to_pkl(val_catalog, "val")
-    
-    return train_catalog,val_catalog
+
+    return train_catalog, val_catalog
 
 
 """
 Obtención de las boxes de cada imagen (KITTI-MOTS)
 """
-def get_dicts(dataset,images_path,extension):
+
+
+def get_dicts(dataset, images_path, extension):
 
     raw_dicts = []
     dataset_dicts = []
     Pedestrians = []
-    Cars =[]
+    Cars = []
     folder_id = []
-    
-    for folder,annos in tqdm(dataset.items(), desc='Folder loop', colour="Cyan"):
-        for key, anno in tqdm(annos.items(), desc='Annons loop', colour="Magenta"):
+
+    for folder, annos in tqdm(dataset.items(), desc="Folder loop", colour="Cyan"):
+        for key, anno in tqdm(annos.items(), desc="Annons loop", colour="Magenta"):
             # print(key)
             record = {}
             img_id = str(key).zfill(6)
-            img_path = os.path.join(images_path,folder,str(img_id)+extension)
+            img_path = os.path.join(images_path, folder, str(img_id) + extension)
             # print(img_path)
             img = cv2.imread(img_path)
-            height,width,channels = img.shape
+            height, width, channels = img.shape
 
             record["file_name"] = img_path
             record["image_id"] = img_id
@@ -80,7 +95,9 @@ def get_dicts(dataset,images_path,extension):
                     bbox = pycocotools.mask.toBbox(instance.mask)
                     mask = rletools.decode(instance.mask)
                     segmentation = []
-                    contours, _ = cv2.findContours((mask).astype(np.uint8),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+                    contours, _ = cv2.findContours(
+                        (mask).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+                    )
 
                     for contour in contours:
                         contour = contour.flatten().tolist()
@@ -92,19 +109,16 @@ def get_dicts(dataset,images_path,extension):
                         # End: convert rle to poly
                         # print (segmentation)
 
-                    """ori_class = int(instance[3])
-                    if ori_class == 1:
-                        transform_class = 0
-                    elif ori_class == 2:
-                        transform_class = 1
-                    else:
-                        # transform_class = 2
-                        continue"""
                     obj = {
-                        "bbox": [float(bbox[0]),float(bbox[1]),float(bbox[2]),float(bbox[3])],
+                        "bbox": [
+                            float(bbox[0]),
+                            float(bbox[1]),
+                            float(bbox[2]),
+                            float(bbox[3]),
+                        ],
                         "bbox_mode": BoxMode.XYWH_ABS,
-                        "category_id": category_id -1,
-                        "segmentation" : segmentation
+                        "category_id": category_id - 1,
+                        "segmentation": segmentation,
                     }
                     objs.append(obj)
             record["annotations"] = objs
