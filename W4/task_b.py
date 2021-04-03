@@ -13,7 +13,9 @@ def init_path_vars(local_run: bool = True):
     global db_path
     global masks_path
     global imgs_path
+    global output_path
 
+    output_path = "outputs/task_b"
 
     if local_run:
         db_path = "../resources/KITTI-MOTS"
@@ -26,11 +28,16 @@ def init_path_vars(local_run: bool = True):
         imgs_path = "../datasets/KITTI-MOTS/training/image_02"
         dataset_pkls = "datasetpkl"
 
+    if not os.path.exists(output_path):
+        print("Creating output dir")
+        os.makedirs(output_path)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Task b')
     parser.add_argument('--local', dest='local', action='store_true')
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     parser = parse_args()

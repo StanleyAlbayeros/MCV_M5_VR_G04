@@ -99,8 +99,3 @@ def get_dicts(dataset,images_path,masks_path,extension=".png"):
             # break
         # break
     return dataset_dicts
-
-
-def getMask(mask_path,img_path):
-    masks = io_tools.load_image(os.path.join(mask_path,"0001/000005.png"))
-    return masks

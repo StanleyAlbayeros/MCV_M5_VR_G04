@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "/home/stan/miniconda3/envs/detect2/bin/python",
+    "python.formatting.provider": "black"
+}
