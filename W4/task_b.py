@@ -14,7 +14,9 @@ def init_path_vars(local_run=True):
     global masks_path
     global imgs_path
     global output_path
-    global dataset_pkls
+    global pkl_path
+    global train_pkl
+    global val_pkl
 
     output_path = "outputs/task_b"
     pkl_path = "datasetpkl"
@@ -49,14 +51,8 @@ if __name__ == "__main__":
     local = parser.local
     init_path_vars(local)
 
-    # data = getDicts.getMask(masks_path,imgs_path)
-    """data = getDicts.get_dicts(db_path,imgs_path,masks_path)
-    img = cv2.imread(os.path.join(masks_path,"0000/000000.png"))
-    for d in data:
-        for s in d["annotations"]:
-            for c in s["segmentation"]:
-                cv2.drawContours(img, c, -1, (255, 0, 0), 3)"""
+    
+    train, val = getDicts.split_data_kitti_motts(db_path, imgs_path, train_pkl, val_pkl)
 
-    train, val = getDicts.split_data_kitti_motts(db_path, imgs_path)
-    print(len(data_train))
-    print(len(data_val))
+    print(len(train))
+    print(len(val))

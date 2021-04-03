@@ -18,17 +18,18 @@ Save catalogues to pkl
 """
 
 
-def catalog_to_pkl(catalog, name):
-    with open(f"datasetpkl/{name}.pkl", "wb") as f:
+def catalog_to_pkl(catalog, path):
+    with open(path, "wb") as f:
+        pickle.dump(catalog, f)
+        f.close()
+
+
+def pkl_to_catalog(path):
+    catalog = []
+    with open(path, "rb") as f:
         catalog = pickle.load(f)
         f.close()
     return catalog
-
-
-def pkl_to_catalog(catalog, name):
-    with open(f"datasetpkl/{name}.pkl", "wb") as f:
-        pickle.dump(catalog, f)
-        f.close()
 
 
 """
@@ -36,9 +37,14 @@ Split para train i val
 """
 
 
-def split_data_kitti_motts(base_path, images_path, extension=".png"):
-    training = ["2", "6", "7", "8", "10", "13", "14", "16", "18"]
-    training = np.char.zfill(training, 4)
+def split_data_kitti_motts(
+    base_path, images_path, train_pkl, val_pkl, extension=".png", random_train_test=False
+):
+    training = [2,6,7,8,10,13,14,16,18]
+    training = np.char.zfill(list(map(str, training)), 5)
+    if random_train_test:
+        intlist = random.sample(range(0, 20), 9)
+        training = np.char.zfill(list(map(str, intlist)), 5)
     raw_dicts = []
     train_dataset = {}
     val_dataset = {}
@@ -49,11 +55,17 @@ def split_data_kitti_motts(base_path, images_path, extension=".png"):
         else:
             val_dataset[f"{file[0:-4]}"] = annotations
 
-    train_catalog = get_dicts(train_dataset, images_path, extension)
-    catalog_to_pkl(train_catalog, "train")
+    if os.path.exists(train_pkl):
+        train_catalog = pkl_to_catalog(train_pkl)
+    else:
+        train_catalog = get_dicts(train_dataset, images_path, extension)
+        catalog_to_pkl(train_catalog, train_pkl)
 
-    val_catalog = get_dicts(val_dataset, images_path, extension)
-    catalog_to_pkl(val_catalog, "val")
+    if os.path.exists(val_pkl):
+        val_catalog = pkl_to_catalog(val_pkl)
+    else:
+        val_catalog = get_dicts(val_dataset, images_path, extension)
+        catalog_to_pkl(val_catalog, val_pkl)
 
     return train_catalog, val_catalog
 
