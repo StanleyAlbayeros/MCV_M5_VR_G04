@@ -1,20 +1,29 @@
-import numpy as np
-import cv2
-from PIL import Image
 import os
-import matplotlib.pyplot as plt
-import io_tools
-import pycocotools
-from tqdm import tqdm
-from detectron2.structures import BoxMode
-import colorama
-import pycocotools.mask as rletools
 import pickle
+
+import colorama
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import pycocotools
+import pycocotools.mask as rletools
+from detectron2.structures import BoxMode
+from PIL import Image
+from tqdm import tqdm
+
+import io_tools
+
+
+def catalog_to_pkl(catalog, name):
+    with open(f"datasetpkl/{name}.pkl", 'wb') as f:
+        pickle.dump(catalog, f)
+        f.close()
+
 
 """
 Split para train i val
 """
-def split_data_kitti_motts(base_path):
+def split_data_kitti_motts(base_path, images_path ,extension=".png"):
     training = ["2","6","7","8","10","13","14","16","18"]
     training = np.char.zfill(training, 4)
     raw_dicts = []
@@ -27,24 +36,28 @@ def split_data_kitti_motts(base_path):
         else:
             val_dataset[f"{file[0:-4]}"] =  annotations
 
-    return train_dataset,val_dataset
+    train_catalog = get_dicts(train_dataset,images_path, extension)
+    catalog_to_pkl(train_catalog, "train")
+
+    val_catalog = get_dicts(val_dataset,images_path, extension)
+    catalog_to_pkl(val_catalog, "val")
+    
+    return train_catalog,val_catalog
 
 
 """
 Obtención de las boxes de cada imagen (KITTI-MOTS)
 """
-def get_dicts(dataset,images_path,masks_path,extension=".png"):
+def get_dicts(dataset,images_path,extension):
+
     raw_dicts = []
     dataset_dicts = []
     Pedestrians = []
     Cars =[]
     folder_id = []
-    """for file in sorted(os.listdir(base_path + "/instances_txt")):
-        annotations = io_tools.load_txt(base_path + "/instances_txt/" + file)
-        raw_dicts.append(annotations)
-        folder_id.append(file[:-4])"""
-    for folder,annos in tqdm(dataset.items(), desc='Folder loop', colour="Red"):
-        for key, anno in tqdm(annos.items(), desc='Annons loop', colour="Blue"):
+    
+    for folder,annos in tqdm(dataset.items(), desc='Folder loop', colour="Cyan"):
+        for key, anno in tqdm(annos.items(), desc='Annons loop', colour="Magenta"):
             # print(key)
             record = {}
             img_id = str(key).zfill(6)
