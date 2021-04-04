@@ -64,7 +64,7 @@ def split_data_kitti_motts(
         train_catalog = get_dicts(train_dataset, images_path, extension)
         if v: print(colorama.Fore.MAGENTA + "\t\tSaving train pkl")
         catalog_to_pkl(train_catalog, train_pkl)
-        del val_catalog
+        del train_catalog
 
     if os.path.exists(val_pkl):
         if v: print(colorama.Fore.BLUE + "\tFound val pkl, loading")
