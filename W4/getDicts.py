@@ -11,12 +11,12 @@ from detectron2.structures import BoxMode
 from PIL import Image
 from tqdm import tqdm
 
+
 import io_tools
 
 """
 Save catalogues to pkl
 """
-
 
 def catalog_to_pkl(catalog, path):
     with open(path, "wb") as f:
@@ -33,11 +33,24 @@ def pkl_to_catalog(path):
 
 
 """
-Split para train i val
+Split para train i val 
 """
 
+def split_data_mots_challenge(db_path,img_path):
+    train_dataset = {}
+    val_dataset = {}
+    for file in sorted(os.listdir(db_path + "/train/instances_txt")):
+        annotations = io_tools.load_txt(db_path+"/train/instances_txt/"+file)
+        train_samples = int(np.floor(len(annotations) * 0.6))
+        val_samples = int(np.floor(len(annotations) * 0.4))
+        train = annotations.keys()
+        #train_dataset[f"{file[0:-4]}"] = annotations.items()[:4]
+        #val_dataset[f"{file[0:-4]}"] = dict(annotations.items()[train_samples + 1: val_samples])
+    print(train)
+    """train_catalog = get_dicts(train_dataset,img_path,".jpg")
+    return train_catalog"""
 
-def split_data_kitti_motts(
+def split_data_kitti_mots(
     base_path, images_path, train_pkl, val_pkl,v =False, extension=".png", random_train_test=False
 ):
     # training = [2,6,7,8,10,13,14,16,18]
@@ -96,16 +109,13 @@ Obtención de las boxes de cada imagen (KITTI-MOTS)
 
 
 def get_dicts(dataset, images_path, extension):
-
     raw_dicts = []
     dataset_dicts = []
     Pedestrians = []
     Cars = []
     folder_id = []
-
     for folder, annos in tqdm(dataset.items(), desc="Folder loop", colour="Cyan"):
         for key, anno in tqdm(annos.items(), desc="Annons loop", colour="Magenta"):
-            # print(key)
             record = {}
             img_id = str(key).zfill(6)
             img_path = os.path.join(images_path, folder, str(img_id) + extension)
@@ -155,6 +165,6 @@ def get_dicts(dataset, images_path, extension):
                     objs.append(obj)
             record["annotations"] = objs
             dataset_dicts.append(record)
-            # break
-        # break
+            #break
+        #break
     return dataset_dicts

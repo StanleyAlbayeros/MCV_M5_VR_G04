@@ -96,9 +96,13 @@ def use_model(
     results = inference_on_dataset(predictor.model, val_loader, evaluator)
     txt_results_path = f'outputs/task_a/txt_results'
     os.makedirs(txt_results_path, exist_ok=True)
-    with open(f'{txt_results_path}/{model_name}.txt', 'w') as writer:
-        writer.write(results)
-        if v: print(colorama.Fore.YELLOW + f"{results}")
+    #with open(f'{txt_results_path}/{model_name}.txt', 'w') as writer:
+    #    writer.write(results)
+    #    if v: print(colorama.Fore.YELLOW + f"{results}")
+    print(f"{model_name} #RESULTS#")
+    print(results)    
+    print(f"{model_name} #RESULTS#")
+	
 
 
 
@@ -131,7 +135,7 @@ if __name__ == "__main__":
 
     if v:
         print(colorama.Fore.LIGHTMAGENTA_EX + "\nGetting dataset train val split")
-    getDicts.split_data_kitti_motts(
+    getDicts.split_data_kitti_mots(
         config.db_path, config.imgs_path, config.train_pkl, config.val_pkl, v
     )
     print(f"Train and val datasets generated")

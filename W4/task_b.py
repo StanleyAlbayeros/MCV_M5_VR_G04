@@ -45,12 +45,13 @@ def parse_args():
         default=False,
         required=False,
     )
-    return parser.parse_args()
+    fname = os.path.splitext(parser.prog)
+    return parser.parse_args(),fname
 
 
 if __name__ == "__main__":
     colorama.init(autoreset=False)
-    parser = parse_args()
+    parser,fname = parse_args()
     local = parser.local
     v = parser.verbose
     generate_samples = parser.generate_samples
@@ -60,11 +61,11 @@ if __name__ == "__main__":
             + "\n#################################\n"
             + str(parser)
         )
-
-    config.init_workspace(local, v)
+    local = False
+    config.init_workspace(local, v,fname[0])
     if v:
         print(colorama.Fore.LIGHTMAGENTA_EX + "\nGetting dataset train val split")
-    getDicts.split_data_kitti_motts(
+    getDicts.split_data_kitti_mots(
         config.db_path, config.imgs_path, config.train_pkl, config.val_pkl, v
     )
     print(f"Train and val datasets generated")
@@ -79,6 +80,7 @@ if __name__ == "__main__":
     MetadataCatalog.get("KITTI_MOTS_val").set(thing_classes=config.thing_classes)
 
     dtst = getDicts.register_helper(config.train_pkl, v)
+
     KITTI_MOTS_metadata = MetadataCatalog.get("KITTI_MOTS_training")
     if generate_samples: utils.generate_sample_imgs(KITTI_MOTS_metadata, dtst, v, config.output_path)
 
