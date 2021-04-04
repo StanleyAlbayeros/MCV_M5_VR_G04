@@ -40,8 +40,12 @@ Split para train i val
 def split_data_kitti_motts(
     base_path, images_path, train_pkl, val_pkl,v =False, extension=".png", random_train_test=False
 ):
-    training = [2,6,7,8,10,13,14,16,18]
-    training = np.char.zfill(list(map(str, training)), 5)
+    # training = [2,6,7,8,10,13,14,16,18]
+    # training = np.char.zfill(list(map(str, training)), 5)
+
+    training = ["2","6","7","8","10","13","14","16","18"]
+    training = np.char.zfill(training, 4)
+
     if random_train_test:
         intlist = random.sample(range(0, 20), 9)
         training = np.char.zfill(list(map(str, intlist)), 5)
