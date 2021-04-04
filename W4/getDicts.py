@@ -38,7 +38,7 @@ Split para train i val
 
 
 def split_data_kitti_motts(
-    base_path, images_path, train_pkl, val_pkl, extension=".png", random_train_test=False
+    base_path, images_path, train_pkl, val_pkl,v =False, extension=".png", random_train_test=False
 ):
     training = [2,6,7,8,10,13,14,16,18]
     training = np.char.zfill(list(map(str, training)), 5)
@@ -48,6 +48,7 @@ def split_data_kitti_motts(
     raw_dicts = []
     train_dataset = {}
     val_dataset = {}
+
     for file in sorted(os.listdir(base_path + "/instances_txt")):
         annotations = io_tools.load_txt(base_path + "/instances_txt/" + file)
         if file[0:-4] in training:
@@ -56,23 +57,38 @@ def split_data_kitti_motts(
             val_dataset[f"{file[0:-4]}"] = annotations
 
     if os.path.exists(train_pkl):
+        if v: print(colorama.Fore.BLUE + "\tFound train pkl, loading")
         train_catalog = pkl_to_catalog(train_pkl)
     else:
+        if v: print(colorama.Fore.BLUE + "\tGenerating train annotations")
         train_catalog = get_dicts(train_dataset, images_path, extension)
+        if v: print(colorama.Fore.MAGENTA + "\t\tSaving train pkl")
         catalog_to_pkl(train_catalog, train_pkl)
+        del val_catalog
 
     if os.path.exists(val_pkl):
+        if v: print(colorama.Fore.BLUE + "\tFound val pkl, loading")
         val_catalog = pkl_to_catalog(val_pkl)
     else:
+        if v: print(colorama.Fore.BLUE + "\tGenerating val annotations")
         val_catalog = get_dicts(val_dataset, images_path, extension)
+        if v: print(colorama.Fore.MAGENTA + "\t\tSaving val pkl")
         catalog_to_pkl(val_catalog, val_pkl)
+        del val_catalog
 
-    return train_catalog, val_catalog
 
+
+def register_helper(path, v):
+    if os.path.exists(path):
+        if v: print(colorama.Fore.CYAN + f"Retreiving information from {path}")
+        catalog = pkl_to_catalog(path)
+    return catalog
 
 """
 Obtención de las boxes de cada imagen (KITTI-MOTS)
 """
+
+
 
 
 def get_dicts(dataset, images_path, extension):
