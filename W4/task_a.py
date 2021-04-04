@@ -12,7 +12,7 @@ import colorama
 import random
 import config
 
-from detectron2.data import DatasetCatalog, MetadataCatalog
+from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
@@ -67,17 +67,16 @@ def use_model(
     cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
     cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
-    cfg.OUTPUT_DIR = f"{config.output_path}/models/{model_name}.pth"
+    current_output_dir = f"{config.output_path}/models/{model_name}"
+    cfg.OUTPUT_DIR = f"{current_output_dir}"
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
 
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     predictor = DefaultPredictor(cfg)
 
-
     build = build_model(cfg)
 
     trainer = DefaultTrainer(cfg)
-
 
     utils.generate_sample_imgs(
         target_metadata=metadata,
@@ -89,6 +88,18 @@ def use_model(
         num_imgs=10,
         model_name=model_name,
     )
+
+    evaluator = COCOEvaluator(
+        "KITTI_MOTS_val", cfg, False, output_dir=f"{current_output_dir}"
+    )
+    val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
+    results = inference_on_dataset(predictor.model, val_loader, evaluator)
+    txt_results_path = f'outputs/task_a/txt_results'
+    os.makedirs(txt_results_path, exist_ok=True)
+    with open(f'{txt_results_path}/{model_name}.txt', 'w') as writer:
+        writer.write(results)
+        if v: print(colorama.Fore.YELLOW + f"{results}")
+
 
 
 if __name__ == "__main__":
