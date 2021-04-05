@@ -36,19 +36,41 @@ def pkl_to_catalog(path):
 Split para train i val 
 """
 
-def split_data_mots_challenge(db_path,img_path):
+def split_data_mots_challenge(db_path,img_path,train_pkl, val_pkl, v= True):
     train_dataset = {}
     val_dataset = {}
     for file in sorted(os.listdir(db_path + "/train/instances_txt")):
         annotations = io_tools.load_txt(db_path+"/train/instances_txt/"+file)
         train_samples = int(np.floor(len(annotations) * 0.6))
         val_samples = int(np.floor(len(annotations) * 0.4))
-        train = annotations.keys()
-        #train_dataset[f"{file[0:-4]}"] = annotations.items()[:4]
-        #val_dataset[f"{file[0:-4]}"] = dict(annotations.items()[train_samples + 1: val_samples])
-    print(train)
-    """train_catalog = get_dicts(train_dataset,img_path,".jpg")
-    return train_catalog"""
+        train = {}
+        val = {}
+        for key in range(1,train_samples):
+            train[key] = annotations[key]
+        for key in range(train_samples,val_samples):
+            val[key] = annotations[key]
+        train_dataset[f"{file[0:-4]}"] = train
+        val_dataset[f"{file[0:-4]}"] = val
+    if os.path.exists(train_pkl):
+        if v: print(colorama.Fore.BLUE + "\t Found train pkl, loading")
+        train_catalog = pkl_to_catalog(train_pkl)
+    else:
+        if v: print(colorama.Fore.BLUE + "\t Generating train annotations")
+        train_catalog = get_dicts(train_dataset, img_path, ".jpg")
+        if v: print(colorama.Fore.MAGENTA + "\t\tSaving train pkl")
+        catalog_to_pkl(train_catalog,train_pkl)
+        del train_catalog
+    if os.path.exists(val_pkl):
+        if v: print(colorama.Fore.BLUE + "\t Found val pkl, loading")
+        val_catalog = pkl_to_catalog(val_pkl)
+    else:
+        if v: print(colorama.Fore.BLUE + "\t Generating val annotations")
+        val_catalog = get_dicts(val_dataset, img_path, ".jpg")
+        if v: print(colorama.Fore.MAGENTA + "\t\tSaving val pkl")
+        catalog_to_pkl(val_catalog,val_pkl)
+        del val_catalog
+
+
 
 def split_data_kitti_mots(
     base_path, images_path, train_pkl, val_pkl,v =False, extension=".png", random_train_test=False
@@ -119,7 +141,6 @@ def get_dicts(dataset, images_path, extension):
             record = {}
             img_id = str(key).zfill(6)
             img_path = os.path.join(images_path, folder, str(img_id) + extension)
-            # print(img_path)
             img = cv2.imread(img_path)
             height, width, channels = img.shape
 
