@@ -3,30 +3,45 @@ import colorama
 
 def init_workspace(local_run, v, python_filename):
     colorama.init(autoreset=False)
-    global db_path
-    global masks_path
-    global imgs_path
+    global db_path_kitti_mots
+    global masks_path_kitti_mots
+    global imgs_path_kitti_mots
+    global db_path_mots_challenge
+    global masks_path_mots_challenge
+    global imgs_path_mots_challenge
     global output_path
     global pkl_path
-    global train_pkl
-    global val_pkl
+    global train_pkl_kitti_mots
+    global val_pkl_kitti_mots
+    global train_pkl_mots_challenge
+    global val_pkl_mots_challenge
     global thing_classes
     global mask_rcnn_models
 
+
     output_path = f"outputs/{python_filename}"
-    pkl_path = "datasetpkl"
-    train_pkl = pkl_path + "/train.pkl"
-    val_pkl = pkl_path + "/val.pkl"
+    pkl_path = "../W4/datasetpkl"
+    train_pkl_kitti_mots = pkl_path + "/train_kitti_mots.pkl"
+    val_pkl_kitti_mots = pkl_path + "/val_kitti_mots.pkl"
+    val_pkl_mots_challenge = pkl_path + "/val_mots_challenge.pkl"
+    train_pkl_mots_challenge = pkl_path + "/train_mots_challenge.pkl"
     thing_classes = ["Car", "Pedestrian", "Other"]
 
     if local_run:
-        db_path = "../resources/KITTI-MOTS"
-        masks_path = "../resources/KITTI-MOTS/instances"
-        imgs_path = "../resources/KITTI-MOTS/training/image_02"
+        db_path_kitti_mots = "../resources/KITTI-MOTS"
+        masks_path_kitti_mots = "../resources/KITTI-MOTS/instances"
+        imgs_path_kitti_mots = "../resources/KITTI-MOTS/training/image_02"
+        db_path_mots_challenge = "../resources/MOTSChallenge"
+        masks_path_mots_challenge = "../resources/MOTSChallenge/instances"
+        imgs_path_mots_challenge = "../resources/MOTSChallenge/train/images"
     else:
-        db_path = "../datasets/KITTI-MOTS"
-        masks_path = "../datasets/KITTI-MOTS/instances"
-        imgs_path = "../datasets/KITTI-MOTS/training/image_02"
+        db_path_kitti_mots = "../datasets/KITTI-MOTS"
+        masks_path_kitti_mots = "../datasets/KITTI-MOTS/instances"
+        imgs_path_kitti_mots = "../datasets/KITTI-MOTS/training/image_02"
+        db_path_mots_challenge = "../datasets/MOTSChallenge"
+        masks_path_mots_challenge = "../datasets/MOTSChallenge/instances"
+        imgs_path_mots_challenge = "../datasets/MOTSChallenge/train/images"
+
 
     if not os.path.exists(output_path):
         if v:
@@ -49,3 +64,4 @@ def init_workspace(local_run, v, python_filename):
         "R101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
         "X101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml" 
     }
+
