@@ -49,6 +49,14 @@ def parse_args():
         default=False,
         required=False,
     )
+    parser.add_argument(
+        "-i",
+        "--geninference",
+        dest="geninference",
+        action="store_true",
+        default=False,
+        required=False,
+    )
     fname = os.path.splitext(parser.prog)
     return parser.parse_args(), fname
 
@@ -60,7 +68,8 @@ def use_model(
     validation_dataset,
     metadata,
     v,
-    print_samples=True,
+    geninference = False,
+    print_samples = True,
 ):
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
@@ -74,9 +83,6 @@ def use_model(
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     predictor = DefaultPredictor(cfg)
 
-    build = build_model(cfg)
-
-    trainer = DefaultTrainer(cfg)
 
     utils.generate_sample_imgs(
         target_metadata=metadata,
@@ -88,7 +94,9 @@ def use_model(
         num_imgs=10,
         model_name=model_name,
     )
-
+    if geninference:
+        build = build_model(cfg)
+#conda env export > detect2.yml
     evaluator = COCOEvaluator(
         "KITTI_MOTS_val", cfg, False, output_dir=f"{current_output_dir}"
     )
@@ -114,6 +122,7 @@ if __name__ == "__main__":
     parser, fname = parse_args()
     local = parser.local
     v = parser.verbose
+    geninference = parser.geninference
     generate_samples = parser.generate_samples
 
     if v:
