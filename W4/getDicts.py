@@ -75,15 +75,15 @@ def split_data_mots_challenge(db_path,img_path,train_pkl, val_pkl, v= True):
 def split_data_kitti_mots(
     base_path, images_path, train_pkl, val_pkl,v =False, extension=".png", random_train_test=False
 ):
-    # training = [2,6,7,8,10,13,14,16,18]
-    # training = np.char.zfill(list(map(str, training)), 5)
+    training = [2,6,7,8,10,13,14,16,18]
+    training = np.char.zfill(list(map(str, training)), 4)
 
-    training = ["2","6","7","8","10","13","14","16","18"]
-    training = np.char.zfill(training, 4)
+    # training = ["2","6","7","8","10","13","14","16","18"]
+    # training = np.char.zfill(training, 4)
 
     if random_train_test:
         intlist = random.sample(range(0, 20), 9)
-        training = np.char.zfill(list(map(str, intlist)), 5)
+        training = np.char.zfill(list(map(str, intlist)), 4)
     raw_dicts = []
     train_dataset = {}
     val_dataset = {}
@@ -99,7 +99,7 @@ def split_data_kitti_mots(
         if v: print(colorama.Fore.BLUE + "\tFound train pkl, loading")
         train_catalog = pkl_to_catalog(train_pkl)
     else:
-        if v: print(colorama.Fore.BLUE + "\tGenerating train annotations")
+        if v: print(colorama.Fore.BLUE + "\tGenerating kitti mots train for : 2,6,7,8,10,13,14,16,18")
         train_catalog = get_dicts(train_dataset, images_path, extension)
         if v: print(colorama.Fore.MAGENTA + "\t\tSaving train pkl")
         catalog_to_pkl(train_catalog, train_pkl)
@@ -168,8 +168,8 @@ def get_dicts(dataset, images_path, extension):
                         # segmentation.append(contour)
                         if len(contour) > 4:
                             segmentation.append(contour)
-                    if len(segmentation) == 0:
-                        continue
+                    # if len(segmentation) == 0:
+                    #     continue
                         # End: convert rle to poly
                         # print (segmentation)
 

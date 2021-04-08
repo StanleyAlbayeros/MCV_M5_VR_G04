@@ -8,7 +8,7 @@ import colorama
 
 def generate_sample_imgs(
     target_metadata,
-    validation_dataset,
+    target_dataset,
     output_path,
     predictor,
     scale,
@@ -16,7 +16,7 @@ def generate_sample_imgs(
     model_name,
 ):
     # for d in random.sample(validation_dataset, num_imgs):
-    for d in validation_dataset:
+    for d in target_dataset:
         im = cv2.imread(d["file_name"])
         outputs = predictor(im)
         v = Visualizer(
@@ -25,13 +25,18 @@ def generate_sample_imgs(
             scale=scale,
             instance_mode=ColorMode.IMAGE_BW,
         )
+
         vis = v.draw_dataset_dict(d)
         img = vis.get_image()[:, :, ::-1]
+        
         imgid = d["image_id"]
+
+        # out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+        # img = out.get_image()[:, :, ::-1]
 
         tmpname = d["file_name"]
         tmpname_list = tmpname.split(os.sep)
-        filepath = f"{output_path}/{model_name}/inf_images/{tmpname_list[-2]}"
+        filepath = f"{output_path}/models/{model_name}/inf_images/{tmpname_list[-2]}"
         
 
         if not os.path.exists(filepath):
@@ -43,7 +48,7 @@ def generate_sample_imgs(
         if v:
             print(f"\t\t\tSaving image to : {filepath}/{imgid}.png")
         cv2.imwrite(filename, img)
-
+""" 
         window_name = "image"
 
         # Using cv2.imshow() method
@@ -55,4 +60,5 @@ def generate_sample_imgs(
         cv2.waitKey(1)
 
         # closing all open windows
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows() """
+

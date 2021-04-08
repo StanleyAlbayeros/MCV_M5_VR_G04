@@ -72,38 +72,31 @@ def use_model(
     geninference=False,
     generate_img=False,
 ):
+    current_output_dir = f"{config.output_path}/models/{model_name}"
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
+    cfg.OUTPUT_DIR = f"{current_output_dir}"
     cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
     cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.9
-    current_output_dir = f"{config.output_path}/models/{model_name}"
-    cfg.OUTPUT_DIR = f"{current_output_dir}"
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
-
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     predictor = DefaultPredictor(cfg)
-
-    # MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
-    if generate_img:
-        utils.generate_sample_imgs(
-            target_metadata=MetadataCatalog.get(cfg.DATASETS.TRAIN[0]),
-            validation_dataset=validation_dataset,
-            output_path=config.output_path,
-            predictor=predictor,
-            scale=1,
-            num_imgs=10,
-            model_name=model_name,
-        )
-
-    if v:
-        print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference start")
-
+    
     if geninference:
+
+        if v:
+            print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference start")
+
         # build = build_model(cfg)
         # conda env export > detect2.yml
+        tasks = ("bbox", "segm")
         evaluator = COCOEvaluator(
-            "KITTI_MOTS_val", cfg, False, output_dir=f"{current_output_dir}"
+            "KITTI_MOTS_val",
+            tasks,
+            use_fast_impl=False,
+            output_dir=f"{current_output_dir}",
         )
         val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
         results = inference_on_dataset(predictor.model, val_loader, evaluator)
@@ -116,8 +109,20 @@ def use_model(
         print(f"{model_name} #RESULTS#")
         print(results)
         print(f"{model_name} #RESULTS#")
-    if v:
-        print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference end")
+        if v:
+            print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference end")
+
+    # MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
+    if generate_img:
+        utils.generate_sample_imgs(
+            target_metadata=metadata.get(cfg.DATASETS.TRAIN[0]),
+            target_dataset=training_dataset,
+            output_path=config.output_path,
+            predictor=predictor,
+            scale=1,
+            num_imgs=10,
+            model_name=model_name,
+        )
 
     return results
 
@@ -164,7 +169,8 @@ if __name__ == "__main__":
     print(f"Train and val datasets generated")
 
     DatasetCatalog.register(
-        "KITTI_MOTS_training", lambda: getDicts.register_helper(config.train_pkl_kitti_mots, v)
+        "KITTI_MOTS_training",
+        lambda: getDicts.register_helper(config.train_pkl_kitti_mots, v),
     )
     MetadataCatalog.get("KITTI_MOTS_training").set(thing_classes=config.thing_classes)
 
