@@ -9,10 +9,11 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}/W4",
-            "program": "${file}",
+            "program": "task_a.py",
             "console": "integratedTerminal",
             // "args": ["-l", "-v", "-gs"]
-            "args": ["-l", "-v"]
+            "args": ["-l", "-v", "-i", "-gs"]
+            // "args": ["-l", "-v"]
             
         }
     ]

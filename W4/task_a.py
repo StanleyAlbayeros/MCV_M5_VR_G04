@@ -11,6 +11,7 @@ import sys
 import colorama
 import random
 import config
+import logging
 
 from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
 from detectron2 import model_zoo
@@ -69,13 +70,13 @@ def use_model(
     metadata,
     v,
     geninference = False,
-    print_samples = True,
+    generate_img = False,
 ):
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
     cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
     cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.9
     current_output_dir = f"{config.output_path}/models/{model_name}"
     cfg.OUTPUT_DIR = f"{current_output_dir}"
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
@@ -83,34 +84,42 @@ def use_model(
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     predictor = DefaultPredictor(cfg)
 
+    #MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
+    if generate_img:
+        utils.generate_sample_imgs(
+            target_metadata=MetadataCatalog.get(cfg.DATASETS.TRAIN[0]),
+            validation_dataset=validation_dataset,
+            output_path=config.output_path,
+            predictor=predictor,
+            scale=1,
+            num_imgs=10,
+            model_name=model_name,
+        )
 
-    utils.generate_sample_imgs(
-        target_metadata=metadata,
-        validation_dataset=validation_dataset,
-        v=v,
-        output_path=config.output_path,
-        predictor=predictor,
-        scale=0.5,
-        num_imgs=10,
-        model_name=model_name,
-    )
+    if v:
+        print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference start")
+
     if geninference:
-        build = build_model(cfg)
+        # build = build_model(cfg)
 #conda env export > detect2.yml
-    evaluator = COCOEvaluator(
-        "KITTI_MOTS_val", cfg, False, output_dir=f"{current_output_dir}"
-    )
-    val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
-    results = inference_on_dataset(predictor.model, val_loader, evaluator)
-    txt_results_path = f'outputs/task_a/txt_results'
-    os.makedirs(txt_results_path, exist_ok=True)
-    #with open(f'{txt_results_path}/{model_name}.txt', 'w') as writer:
-    #    writer.write(results)
-    #    if v: print(colorama.Fore.YELLOW + f"{results}")
-    print(f"{model_name} #RESULTS#")
-    print(results)    
-    print(f"{model_name} #RESULTS#")
-	
+        evaluator = COCOEvaluator(
+            "KITTI_MOTS_val", ("bbox", "segm"), False, output_dir=f"{current_output_dir}"
+        )
+        val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
+        results = inference_on_dataset(predictor.model, val_loader, evaluator)
+        txt_results_path = f'outputs/task_a/txt_results'
+        os.makedirs(txt_results_path, exist_ok=True)
+        with open(f'{txt_results_path}/{model_name}.txt', 'w') as writer:
+           writer.write(str(results))
+           if v: print(colorama.Fore.YELLOW + f"{results}")
+        print(f"{model_name} #RESULTS#")
+        print(results)    
+        print(f"{model_name} #RESULTS#")
+    if v:
+        print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference end")
+
+    return results
+        
 
 
 
@@ -133,6 +142,7 @@ if __name__ == "__main__":
         )
 
     config.init_workspace(local, v, fname[0])
+    if v: logging.basicConfig(level=logging.INFO)
 
     ##########################################################################################
     ###################################   WORKSPACE SETUP   ##################################
@@ -162,6 +172,8 @@ if __name__ == "__main__":
     train = getDicts.register_helper(config.train_pkl, v)
     val = getDicts.register_helper(config.val_pkl, v)
 
+    if v:
+        print(colorama.Fore.LIGHTMAGENTA_EX + "Done getting dataset train val split\n")
     ##########################################################################################
     ###############################   DATASET + METADATA SETUP   #############################
     ##########################################################################################
@@ -178,14 +190,19 @@ if __name__ == "__main__":
                 colorama.Fore.LIGHTGREEN_EX
                 + f"\nUsing {model_name} from url {model_url}"
             )
-        use_model(
+        config.mask_rcnn_results[f"{model_name}"] = use_model(
             model_name=model_name,
             model_url=model_url,
             training_dataset=train,
             validation_dataset=val,
             metadata=KITTI_MOTS_metadata,
             v=v,
+            geninference = geninference,
+            generate_img= generate_samples
         )
+        # break
+    for model_name, result in config.mask_rcnn_results.items():
+        print(f"{model_name}: {result}\n\n\n\n")
 
     ##########################################################################################
     ##############################   PRETRAINED MODEL INFERENCE   ############################

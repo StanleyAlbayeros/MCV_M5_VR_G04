@@ -155,6 +155,7 @@ def get_dicts(dataset, images_path, extension):
 
                 category_id = instance.class_id
 
+
                 if category_id == 1 or category_id == 2:
                     bbox = pycocotools.mask.toBbox(instance.mask)
                     mask = rletools.decode(instance.mask)
@@ -181,7 +182,8 @@ def get_dicts(dataset, images_path, extension):
                             float(bbox[3]),
                         ],
                         "bbox_mode": BoxMode.XYWH_ABS,
-                        "category_id": category_id - 1,
+                        "category_id": 0 if category_id==1 else 1,
+                        "type": 'Car' if category_id==1 else 'Pedestrian',
                         "segmentation": segmentation,
                     }
                     objs.append(obj)

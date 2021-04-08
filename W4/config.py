@@ -17,6 +17,7 @@ def init_workspace(local_run, v, python_filename):
     global val_pkl_mots_challenge
     global thing_classes
     global mask_rcnn_models
+    global mask_rcnn_results
 
 
     output_path = f"outputs/{python_filename}"
@@ -64,4 +65,15 @@ def init_workspace(local_run, v, python_filename):
         "R101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
         "X101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml" 
     }
-
+    mask_rcnn_results ={
+        "R50-C4_x1" : "",
+        "R50-DC5_x1" : "",
+        "R50-FPN_x1" : "",
+        "R50-C4_x3" : "",
+        "R50-DC5_x3" : "",
+        "R50-FPN_x3" : "",
+        "R101-C4_x3" : "",
+        "R101-DC5_x3" : "",
+        "R101-FPN_x3" : "",
+        "X101-FPN_x3" : "" 
+    }
