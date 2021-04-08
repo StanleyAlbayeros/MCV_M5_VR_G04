@@ -10,6 +10,7 @@ def generate_sample_imgs(
     target_metadata,
     target_dataset,
     output_path,
+    add_str,
     predictor,
     scale,
     num_imgs,
@@ -36,7 +37,7 @@ def generate_sample_imgs(
 
         tmpname = d["file_name"]
         tmpname_list = tmpname.split(os.sep)
-        filepath = f"{output_path}/models/{model_name}/inf_images/{tmpname_list[-2]}"
+        filepath = f"{output_path}/models/{model_name}/inf_images/{tmpname_list[-2]}{add_str}"
         
 
         if not os.path.exists(filepath):

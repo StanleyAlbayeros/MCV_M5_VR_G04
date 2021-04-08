@@ -181,8 +181,8 @@ def get_dicts(dataset, images_path, extension):
                             float(bbox[3]),
                         ],
                         "bbox_mode": BoxMode.XYWH_ABS,
-                        "category_id": 0 if category_id==1 else 1,
-                        "type": 'Car' if category_id==1 else 'Pedestrian',
+                        "category_id": 2 if category_id==1 else 0,
+                        "type": 'Car' if category_id==1 else 'Person',
                         "segmentation": segmentation,
                     }
                     objs.append(obj)

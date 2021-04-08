@@ -26,7 +26,7 @@ def init_workspace(local_run, v, python_filename):
     val_pkl_kitti_mots = pkl_path + "/val_kitti_mots.pkl"
     val_pkl_mots_challenge = pkl_path + "/val_mots_challenge.pkl"
     train_pkl_mots_challenge = pkl_path + "/train_mots_challenge.pkl"
-    thing_classes = ["Car", "Pedestrian", "Other"]
+    thing_classes = ["Person", "Other", "Car"]
 
     if local_run:
         db_path_kitti_mots = "../resources/KITTI-MOTS"
