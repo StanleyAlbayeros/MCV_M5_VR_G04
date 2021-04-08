@@ -117,11 +117,10 @@ def split_data_kitti_mots(
 
 
 
-def register_helper(paths, v):
-    for path in paths:
-        if os.path.exists(path):
-            if v: print(colorama.Fore.CYAN + f"Retreiving information from {path}")
-            catalog = pkl_to_catalog(path)
+def register_helper(path, v):
+    if os.path.exists(path):
+        if v: print(colorama.Fore.CYAN + f"Retreiving information from {path}")
+        catalog = pkl_to_catalog(path)
     return catalog
 
 """

@@ -69,8 +69,8 @@ def use_model(
     validation_dataset,
     metadata,
     v,
-    geninference = False,
-    generate_img = False,
+    geninference=False,
+    generate_img=False,
 ):
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
@@ -84,7 +84,7 @@ def use_model(
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     predictor = DefaultPredictor(cfg)
 
-    #MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
+    # MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
     if generate_img:
         utils.generate_sample_imgs(
             target_metadata=MetadataCatalog.get(cfg.DATASETS.TRAIN[0]),
@@ -101,26 +101,25 @@ def use_model(
 
     if geninference:
         # build = build_model(cfg)
-#conda env export > detect2.yml
+        # conda env export > detect2.yml
         evaluator = COCOEvaluator(
-            "KITTI_MOTS_val", ("bbox", "segm"), False, output_dir=f"{current_output_dir}"
+            "KITTI_MOTS_val", cfg, False, output_dir=f"{current_output_dir}"
         )
         val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
         results = inference_on_dataset(predictor.model, val_loader, evaluator)
-        txt_results_path = f'outputs/task_a/txt_results'
+        txt_results_path = f"outputs/task_a/txt_results"
         os.makedirs(txt_results_path, exist_ok=True)
-        with open(f'{txt_results_path}/{model_name}.txt', 'w') as writer:
-           writer.write(str(results))
-           if v: print(colorama.Fore.YELLOW + f"{results}")
+        with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
+            writer.write(str(results))
+            if v:
+                print(colorama.Fore.YELLOW + f"{results}")
         print(f"{model_name} #RESULTS#")
-        print(results)    
+        print(results)
         print(f"{model_name} #RESULTS#")
     if v:
         print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference end")
 
     return results
-        
-
 
 
 if __name__ == "__main__":
@@ -142,7 +141,8 @@ if __name__ == "__main__":
         )
 
     config.init_workspace(local, v, fname[0])
-    if v: logging.basicConfig(level=logging.INFO)
+    if v:
+        logging.basicConfig(level=logging.INFO)
 
     ##########################################################################################
     ###################################   WORKSPACE SETUP   ##################################
@@ -155,22 +155,25 @@ if __name__ == "__main__":
     if v:
         print(colorama.Fore.LIGHTMAGENTA_EX + "\nGetting dataset train val split")
     getDicts.split_data_kitti_mots(
-        config.db_path, config.imgs_path, config.train_pkl, config.val_pkl, v
+        config.db_path_kitti_mots,
+        config.imgs_path_kitti_mots,
+        config.train_pkl_kitti_mots,
+        config.val_pkl_kitti_mots,
+        v,
     )
     print(f"Train and val datasets generated")
 
     DatasetCatalog.register(
-        "KITTI_MOTS_training", lambda: getDicts.register_helper(config.train_pkl, v)
+        "KITTI_MOTS_training", lambda: getDicts.register_helper(config.train_pkl_kitti_mots, v)
     )
     MetadataCatalog.get("KITTI_MOTS_training").set(thing_classes=config.thing_classes)
 
     DatasetCatalog.register(
-        "KITTI_MOTS_val", lambda: getDicts.register_helper(config.val_pkl, v)
+        "KITTI_MOTS_val", lambda: getDicts.register_helper(config.val_pkl_kitti_mots, v)
     )
     MetadataCatalog.get("KITTI_MOTS_val").set(thing_classes=config.thing_classes)
-
-    train = getDicts.register_helper(config.train_pkl, v)
-    val = getDicts.register_helper(config.val_pkl, v)
+    train = getDicts.register_helper(config.train_pkl_kitti_mots, v)
+    val = getDicts.register_helper(config.val_pkl_kitti_mots, v)
 
     if v:
         print(colorama.Fore.LIGHTMAGENTA_EX + "Done getting dataset train val split\n")
@@ -197,8 +200,8 @@ if __name__ == "__main__":
             validation_dataset=val,
             metadata=KITTI_MOTS_metadata,
             v=v,
-            geninference = geninference,
-            generate_img= generate_samples
+            geninference=geninference,
+            generate_img=generate_samples,
         )
         # break
     for model_name, result in config.mask_rcnn_results.items():
