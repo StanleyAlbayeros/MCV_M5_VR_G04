@@ -75,13 +75,13 @@ def use_model(
     current_output_dir = f"{config.output_path}/models/{model_name}"
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
+    os.makedirs(current_output_dir, exist_ok=True)
     cfg.OUTPUT_DIR = f"{current_output_dir}"
-    cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
+    # cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
     cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8
-    os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     predictor = DefaultPredictor(cfg)
     
     if geninference:

@@ -5,14 +5,29 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current file",
+            "name": "Python: Task A",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}/W4",
             "program": "task_a.py",
             "console": "integratedTerminal",
             // "args": ["-l", "-v", "-gs"]
-            "args": ["-l", "-v", "-i", "-gs"]
+            // "args": ["-l", "-v", "-i", "-gs"]
+            "args": ["-l", "-v", "-i"]
+            // "args": ["-l", "-v"]
+            
+        },
+        
+        {
+            "name": "Python: Task B",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/W4",
+            "program": "task_b.py",
+            "console": "integratedTerminal",
+            // "args": ["-l", "-v", "-gs"]
+            // "args": ["-l", "-v", "-i", "-gs"]
+            "args": ["-l", "-v", "-i"]
             // "args": ["-l", "-v"]
             
         }

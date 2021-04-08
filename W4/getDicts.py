@@ -155,37 +155,38 @@ def get_dicts(dataset, images_path, extension):
                 category_id = instance.class_id
 
 
-                if category_id == 1 or category_id == 2:
-                    bbox = pycocotools.mask.toBbox(instance.mask)
-                    mask = rletools.decode(instance.mask)
-                    segmentation = []
-                    contours, _ = cv2.findContours(
-                        (mask).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
-                    )
+                # if category_id == 1 or category_id == 2:
+                bbox = pycocotools.mask.toBbox(instance.mask)
+                mask = rletools.decode(instance.mask)
+                segmentation = []
+                contours, _ = cv2.findContours(
+                    (mask).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+                )
 
-                    for contour in contours:
-                        contour = contour.flatten().tolist()
-                        # segmentation.append(contour)
-                        if len(contour) > 4:
-                            segmentation.append(contour)
-                    # if len(segmentation) == 0:
-                    #     continue
-                        # End: convert rle to poly
-                        # print (segmentation)
+                for contour in contours:
+                    contour = contour.flatten().tolist()
+                    # segmentation.append(contour)
+                    if len(contour) > 4:
+                        segmentation.append(contour)
+                # if len(segmentation) == 0:
+                #     continue
+                    # End: convert rle to poly
+                    # print (segmentation)
 
-                    obj = {
-                        "bbox": [
-                            float(bbox[0]),
-                            float(bbox[1]),
-                            float(bbox[2]),
-                            float(bbox[3]),
-                        ],
-                        "bbox_mode": BoxMode.XYWH_ABS,
-                        "category_id": 2 if category_id==1 else 0,
-                        "type": 'Car' if category_id==1 else 'Person',
-                        "segmentation": segmentation,
-                    }
-                    objs.append(obj)
+                # thing_classes = ["Person", "Other", "Car"]
+                obj = {
+                    "bbox": [
+                        float(bbox[0]),
+                        float(bbox[1]),
+                        float(bbox[2]),
+                        float(bbox[3]),
+                    ],
+                    "bbox_mode": BoxMode.XYWH_ABS,
+                    "type": 'Car' if category_id==2 else 'Person',
+                    "category_id": 2 if category_id==1 else 0,
+                    "segmentation": segmentation,
+                }
+                objs.append(obj)
             record["annotations"] = objs
             dataset_dicts.append(record)
             #break

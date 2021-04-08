@@ -6,17 +6,23 @@ import cv2
 import matplotlib.pyplot as plt
 import pycocotools.mask as rletools
 import getDicts
+from pycocotools import coco
+import sys
 import colorama
 import random
 import config
+import logging
 
-from detectron2.data import DatasetCatalog, MetadataCatalog
+from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
 from detectron2 import model_zoo
-from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
-
+from detectron2.modeling import build_model
+from detectron2.engine import DefaultTrainer
+from detectron2.engine import DefaultPredictor
+from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from src import utils
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Task b")
@@ -45,87 +51,192 @@ def parse_args():
         required=False,
     )
     parser.add_argument(
-        "-km",
-        "--kitti-Mots",
-        dest = "kitti_mots",
-        required = False,
-        default= False,
+        "-i",
+        "--geninference",
+        dest="geninference",
         action="store_true",
-        help = "Add kitti-mots to training dataset"
-    )
-    parser.add_argument(
-        "-mc",
-        "--MOTSChallenge",
-        dest = "mots_challenge",
-        required = False,
-        action = "store_true",
-        help = "Add MOTSChallenge to training dataset"
+        default=False,
+        required=False,
     )
     fname = os.path.splitext(parser.prog)
-    return parser.parse_args(),fname
+    return parser.parse_args(), fname
+
+
+def use_model(
+    model_name,
+    model_url,
+    training_dataset,
+    validation_dataset,
+    metadata,
+    v,
+    geninference=False,
+    generate_img=False,
+):
+    current_output_dir = f"{config.output_path}/models/{model_name}"
+    cfg = get_cfg()
+    cfg.merge_from_file(model_zoo.get_config_file(model_url))
+    os.makedirs(current_output_dir, exist_ok=True)
+    cfg.OUTPUT_DIR = f"{current_output_dir}"
+    cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
+    cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
+    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
+    cfg.DATALOADER.NUM_WORKERS = 2
+    cfg.SOLVER.IMS_PER_BATCH = 8
+    cfg.SOLVER.BASE_LR = 0.001  # pick a good LR
+    cfg.SOLVER.MAX_ITER = 300    # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    cfg.SOLVER.STEPS = []        # do not decay learning rate
+    cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 64   # faster, and good enough for this toy dataset (default: 512)
+    # if train:
+    if True:
+        trainer = DefaultTrainer(cfg) 
+        trainer.resume_or_load(resume=False)
+        trainer.train()
+
+    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")  # path to the model we just trained
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
+    predictor = DefaultPredictor(cfg)
+
+    if geninference:
+
+        if v:
+            print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference start")
+
+        # build = build_model(cfg)
+        # conda env export > detect2.yml
+        tasks = ("bbox", "segm")
+        evaluator = COCOEvaluator(
+            "KITTI_MOTS_val",
+            tasks,
+            use_fast_impl=False,
+            output_dir=f"{current_output_dir}",
+        )
+        val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
+
+        results = inference_on_dataset(predictor.model, val_loader, evaluator)
+        txt_results_path = f"outputs/task_b/txt_results"
+        os.makedirs(txt_results_path, exist_ok=True)
+        with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
+            writer.write(str(results))
+            if v:
+                print(colorama.Fore.YELLOW + f"{results}")
+        print(f"{model_name} #RESULTS#")
+        print(results)
+        print(f"{model_name} #RESULTS#")
+        if v:
+            print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference end")
+    # MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
+
+    if generate_img:
+        utils.generate_sample_imgs(
+            target_metadata=metadata.get(cfg.DATASETS.TEST[0]),
+            target_dataset=validation_dataset,
+            output_path=config.output_path,
+            add_str = "_val",
+            predictor=predictor,
+            scale=1,
+            num_imgs=10,
+            model_name=model_name,
+        )
+        utils.generate_sample_imgs(
+            target_metadata=metadata.get(cfg.DATASETS.TRAIN[0]),
+            target_dataset=training_dataset,
+            output_path=config.output_path,
+            add_str = "_train",
+            predictor=predictor,
+            scale=1,
+            num_imgs=10,
+            model_name=model_name,
+        )
+    return results
 
 
 if __name__ == "__main__":
+    ##########################################################################################
+    ###################################   WORKSPACE SETUP   ##################################
+    ##########################################################################################
     colorama.init(autoreset=False)
-    parser,fname = parse_args()
-    kitti_mots = parser.kitti_mots
-    mots_challenge = parser.mots_challenge
-
+    parser, fname = parse_args()
     local = parser.local
     v = parser.verbose
-
+    geninference = parser.geninference
     generate_samples = parser.generate_samples
+
     if v:
         print(
             colorama.Fore.LIGHTRED_EX
             + "\n#################################\n"
             + str(parser)
         )
-    local = False
-    config.init_workspace(local, v,fname[0])
-    print(config.train_pkl_kitti_mots)
-    train_pkl = []
-    val_pkl = []
+
+    config.init_workspace(local, v, fname[0])
+    if v:
+        logging.basicConfig(level=logging.INFO)
+
+    ##########################################################################################
+    ###################################   WORKSPACE SETUP   ##################################
+    ##########################################################################################
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    ##########################################################################################
+    ###############################   DATASET + METADATA SETUP   #############################
+    ##########################################################################################
+
     if v:
         print(colorama.Fore.LIGHTMAGENTA_EX + "\nGetting dataset train val split")
-    if kitti_mots:
-        getDicts.split_data_kitti_mots(
-            config.db_path_kitti_mots, config.imgs_path_kitti_mots,
-            config.train_pkl_kitti_mots, config.val_pkl_kitti_mots
-        )
-
-        train_pkl.append(config.train_pkl_kitti_mots)
-        val_pkl.append(config.val_pkl_kitti_mots)
-
-    if mots_challenge:
-        getDicts.split_data_mots_challenge(
-            config.db_path_mots_challenge, config.imgs_path_mots_challenge,
-            config.train_pkl_mots_challenge, config.val_pkl_mots_challenge
-        )
-        train_pkl.append(config.train_pkl_mots_challenge)
-        val_pkl.append(config.val_pkl_mots_challenge)
+    getDicts.split_data_kitti_mots(
+        config.db_path_kitti_mots,
+        config.imgs_path_kitti_mots,
+        config.train_pkl_kitti_mots,
+        config.val_pkl_kitti_mots,
+        v,
+    )
     print(f"Train and val datasets generated")
 
     DatasetCatalog.register(
-        "training_set", lambda: getDicts.register_helper(train_pkl, v)
+        "KITTI_MOTS_training",
+        lambda: getDicts.register_helper(config.train_pkl_kitti_mots, v),
     )
-    MetadataCatalog.get("training_set").set(thing_classes=config.thing_classes)
+    MetadataCatalog.get("KITTI_MOTS_training").set(thing_classes=config.thing_classes)
+
     DatasetCatalog.register(
-        "val_set", lambda: getDicts.register_helper(val_pkl, v)
+        "KITTI_MOTS_val", lambda: getDicts.register_helper(config.val_pkl_kitti_mots, v)
     )
     MetadataCatalog.get("KITTI_MOTS_val").set(thing_classes=config.thing_classes)
+    train = getDicts.register_helper(config.train_pkl_kitti_mots, v)
+    val = getDicts.register_helper(config.val_pkl_kitti_mots, v)
 
-    dtst = getDicts.register_helper(train_pkl, v)
+    if v:
+        print(colorama.Fore.LIGHTMAGENTA_EX + "Done getting dataset train val split\n")
+    ##########################################################################################
+    ###############################   DATASET + METADATA SETUP   #############################
+    ##########################################################################################
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    ##########################################################################################
+    ##############################   PRETRAINED MODEL INFERENCE   ############################
+    ##########################################################################################
 
     KITTI_MOTS_metadata = MetadataCatalog.get("KITTI_MOTS_training")
-    if generate_samples: utils.generate_sample_imgs(KITTI_MOTS_metadata, dtst, v, config.output_path)
 
-    #  config.py vars
-    #  db_path
-    #  masks_path
-    #  imgs_path
-    #  output_path
-    #  pkl_path
-    #  train_pkl
-    #  val_pkl
-    #  thing_classes
+    for model_name, model_url in config.mask_rcnn_models.items():
+        if v:
+            print(
+                colorama.Fore.LIGHTGREEN_EX
+                + f"\nUsing {model_name} from url {model_url}"
+            )
+        config.mask_rcnn_results[f"{model_name}"] = use_model(
+            model_name=model_name,
+            model_url=model_url,
+            training_dataset=train,
+            validation_dataset=val,
+            metadata=KITTI_MOTS_metadata,
+            v=v,
+            geninference=geninference,
+            generate_img=generate_samples,
+        )
+        # break
+    for model_name, result in config.mask_rcnn_results.items():
+        print(f"{model_name}: {result}\n\n\n\n")
+
+    ##########################################################################################
+    ##############################   PRETRAINED MODEL INFERENCE   ############################
+    ##########################################################################################

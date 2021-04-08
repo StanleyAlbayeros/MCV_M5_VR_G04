@@ -1,7 +1,7 @@
 import os
 import colorama
 
-def init_workspace(local_run, v, python_filename):
+def init_workspace(local_run, v, _python_filename):
     colorama.init(autoreset=False)
     global db_path_kitti_mots
     global masks_path_kitti_mots
@@ -18,7 +18,9 @@ def init_workspace(local_run, v, python_filename):
     global thing_classes
     global mask_rcnn_models
     global mask_rcnn_results
-
+    global python_filename
+    
+    python_filename = _python_filename
 
     output_path = f"outputs/{python_filename}"
     pkl_path = "../W4/datasetpkl"
@@ -54,8 +56,8 @@ def init_workspace(local_run, v, python_filename):
         os.makedirs(pkl_path)
     
     mask_rcnn_models ={
-        "R50-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
         "R50-FPN_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml",
+        "R50-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
         "R101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
         "X101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml",
         "R50-C4_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_1x.yaml",
@@ -66,8 +68,8 @@ def init_workspace(local_run, v, python_filename):
         "R101-DC5_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_DC5_3x.yaml"
     }
     mask_rcnn_results ={
-        "R50-FPN_x3" : "",
         "R50-FPN_x1" : "",
+        "R50-FPN_x3" : "",
         "R101-FPN_x3" : "",
         "X101-FPN_x3" : "",
         "R50-C4_x1" : "",
