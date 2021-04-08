@@ -99,7 +99,7 @@ def use_model(
             output_dir=f"{current_output_dir}",
         )
         val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
-        
+
         results = inference_on_dataset(predictor.model, val_loader, evaluator)
         txt_results_path = f"outputs/task_a/txt_results"
         os.makedirs(txt_results_path, exist_ok=True)
@@ -112,14 +112,13 @@ def use_model(
         print(f"{model_name} #RESULTS#")
         if v:
             print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference end")
-
     # MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
     if generate_img:
         utils.generate_sample_imgs(
             target_metadata=metadata.get(cfg.DATASETS.TEST[0]),
             target_dataset=validation_dataset,
             output_path=config.output_path,
-            add_str = "_test",
+            add_str = "_val",
             predictor=predictor,
             scale=1,
             num_imgs=10,
