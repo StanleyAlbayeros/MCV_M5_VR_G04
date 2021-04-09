@@ -110,11 +110,12 @@ def use_model(
             tasks,
             use_fast_impl=False,
             output_dir=f"{current_output_dir}",
+            distributed = True
         )
         val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
 
         results = inference_on_dataset(predictor.model, val_loader, evaluator)
-        txt_results_path = f"outputs/task_b/txt_results"
+        txt_results_path = f"../W4/outputs/task_b/txt_results"
         os.makedirs(txt_results_path, exist_ok=True)
         with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
             writer.write(str(results))
