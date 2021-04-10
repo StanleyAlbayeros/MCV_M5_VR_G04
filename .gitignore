@@ -131,7 +131,7 @@ dmypy.json
 
 
 # datasets
-datasets/
+resources/
 
 # job foldfer
 jobs/
@@ -142,4 +142,7 @@ resources/KITTI-MOTS/
 resources/MOTSChallenge/
 W3/outputs/
 detectron2/
-W4/outputs/task_a/models/
+W4/outputs/
+W4/stanley
+W4/stanley_group04_20781.err
+W4/stanley_group04_20781.out
