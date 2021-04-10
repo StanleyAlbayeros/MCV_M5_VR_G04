@@ -29,22 +29,13 @@ def init_workspace(local_run, v, _python_filename):
     train_pkl_mots_challenge = pkl_path + "/train_mots_challenge.pkl"
     thing_classes = ["Person", "Other", "Car"]
 
-    if local_run:
-        output_path = f"outputs/{python_filename}"
-        db_path_kitti_mots = "../resources/KITTI-MOTS"
-        masks_path_kitti_mots = "../resources/KITTI-MOTS/instances"
-        imgs_path_kitti_mots = "../resources/KITTI-MOTS/training/image_02"
-        db_path_mots_challenge = "../resources/MOTSChallenge"
-        masks_path_mots_challenge = "../resources/MOTSChallenge/instances"
-        imgs_path_mots_challenge = "../resources/MOTSChallenge/train/images"
-    else:
-        db_path_kitti_mots = "../resources/KITTI-MOTS"
-        masks_path_kitti_mots = "../resources/KITTI-MOTS/instances"
-        imgs_path_kitti_mots = "../resources/KITTI-MOTS/training/image_02"
-        db_path_mots_challenge = "../resources/MOTSChallenge"
-        masks_path_mots_challenge = "../resources/MOTSChallenge/instances"
-        imgs_path_mots_challenge = "../resources/MOTSChallenge/train/images"
-        output_path = f"../W4/outputs/{python_filename}"
+    output_path = f"outputs/{python_filename}"
+    db_path_kitti_mots = "../resources/KITTI-MOTS"
+    masks_path_kitti_mots = "../resources/KITTI-MOTS/instances"
+    imgs_path_kitti_mots = "../resources/KITTI-MOTS/training/image_02"
+    db_path_mots_challenge = "../resources/MOTSChallenge"
+    masks_path_mots_challenge = "../resources/MOTSChallenge/instances"
+    imgs_path_mots_challenge = "../resources/MOTSChallenge/train/images"
 
     if not os.path.exists(output_path):
         if v:
