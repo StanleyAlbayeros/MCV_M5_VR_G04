@@ -79,15 +79,15 @@ def use_model(
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
     os.makedirs(current_output_dir, exist_ok=True)
     cfg.OUTPUT_DIR = f"{current_output_dir}"
-    # cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
-    cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8
+    cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
+    cfg.DATALOADER.NUM_WORKERS = 8
+    # cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
+    # cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
+    # cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8
     predictor = DefaultPredictor(cfg)
     
     if geninference:
-
         if v:
             print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference start")
 
@@ -99,19 +99,22 @@ def use_model(
             tasks,
             use_fast_impl=False,
             output_dir=f"{current_output_dir}",
+            distributed=True
         )
         val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
 
         results = inference_on_dataset(predictor.model, val_loader, evaluator)
+        
+        print(f"{model_name} #RESULTS#")
+        print(results)
+        print(f"{model_name} #RESULTS#")
+        
         txt_results_path = f"outputs/task_a/txt_results"
         os.makedirs(txt_results_path, exist_ok=True)
         with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
             writer.write(str(results))
             if v:
                 print(colorama.Fore.YELLOW + f"{results}")
-        print(f"{model_name} #RESULTS#")
-        print(results)
-        print(f"{model_name} #RESULTS#")
         if v:
             print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference end")
     # MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
@@ -120,7 +123,7 @@ def use_model(
             target_metadata=metadata.get(cfg.DATASETS.TEST[0]),
             target_dataset=validation_dataset,
             output_path=config.output_path,
-            add_str = "_val",
+            add_str="_val",
             predictor=predictor,
             scale=1,
             num_imgs=10,
@@ -130,7 +133,7 @@ def use_model(
             target_metadata=metadata.get(cfg.DATASETS.TRAIN[0]),
             target_dataset=training_dataset,
             output_path=config.output_path,
-            add_str = "_train",
+            add_str="_train",
             predictor=predictor,
             scale=1,
             num_imgs=10,

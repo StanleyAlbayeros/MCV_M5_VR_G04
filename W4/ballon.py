@@ -61,14 +61,14 @@ def get_balloon_dicts(img_dir):
     return dataset_dicts
 
 
-"""for d in ["train", "val"]:
+for d in ["train", "val"]:
     DatasetCatalog.register("balloon_" + d, lambda d=d: get_balloon_dicts("balloon/" + d))
-    MetadataCatalog.get("balloon_" + d).set(thing_classes=["balloon"])"""
-DatasetCatalog.register("balloon_train", lambda: getDicts.register_helper("../W4/datasetpkl/train_kitti_mots.pkl",True))
+    MetadataCatalog.get("balloon_" + d).set(thing_classes=["balloon"])
+    
+# DatasetCatalog.register("balloon_train", lambda: getDicts.register_helper("../W4/datasetpkl/train_kitti_mots.pkl",True))
 
 balloon_metadata = MetadataCatalog.get("balloon_train")
-DatasetCatalog.register("balloon_val", lambda: getDicts.register_helper("../W4/datasetpkl/val_kitti_mots.pkl",True))
-
+# DatasetCatalog.register("balloon_val", lambda: getDicts.register_helper("../W4/datasetpkl/val_kitti_mots.pkl",True))
 balloon_metadata2 = MetadataCatalog.get("balloon_val")
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))

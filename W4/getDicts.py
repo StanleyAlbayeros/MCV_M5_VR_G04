@@ -136,7 +136,11 @@ def get_dicts(dataset, images_path, extension):
     Pedestrians = []
     Cars = []
     folder_id = []
+
     for folder, annos in tqdm(dataset.items(), desc="Folder loop", colour="Cyan"):
+    # for idx, dir in tqdm(enumerate(images_path), desc = "Folder loop", colour="Cyan"):
+        # print(folder)
+        # exit()
         for key, anno in tqdm(annos.items(), desc="Annons loop", colour="Magenta"):
             record = {}
             img_id = str(key).zfill(6)
@@ -158,16 +162,11 @@ def get_dicts(dataset, images_path, extension):
                 # if category_id == 1 or category_id == 2:
                 bbox = pycocotools.mask.toBbox(instance.mask)
                 mask = rletools.decode(instance.mask)
-                segmentation = []
                 contours, _ = cv2.findContours(
                     (mask).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
                 )
-
-                for contour in contours:
-                    contour = contour.flatten().tolist()
-                    # segmentation.append(contour)
-                    if len(contour) > 4:
-                        segmentation.append(contour)
+                segmentation = [[int(i) for i in c.flatten()] for c in contours]
+                segmentation = [s for s in segmentation if len(s) >= 6]
 
                 if not segmentation:
                     continue
@@ -178,21 +177,27 @@ def get_dicts(dataset, images_path, extension):
                     # print (segmentation)
 
                 # thing_classes = ["Person", "Other", "Car"]
-                obj = {
-                    "bbox": [
-                        float(bbox[0]),
-                        float(bbox[1]),
-                        float(bbox[2]),
-                        float(bbox[3]),
-                    ],
-                    "bbox_mode": BoxMode.XYWH_ABS,
-                    "type": 'Car' if category_id==2 else 'Person',
-                    "category_id": 2 if category_id==1 else 0,
-                    "segmentation": segmentation,
-                }
-                objs.append(obj)
+                if category_id == 1 or category_id == 2:
+                    obj = {
+                        "bbox": [
+                            float(bbox[0]),
+                            float(bbox[1]),
+                            float(bbox[2]),
+                            float(bbox[3]),
+                        ],
+                        "bbox_mode": BoxMode.XYWH_ABS,
+                        # "type": 'Car' if category_id==2 else 'Person',
+                        "category_id": 2 if category_id==1 else 0,
+                        "segmentation": segmentation,
+                    }
+                    objs.append(obj)
+                    
             record["annotations"] = objs
             dataset_dicts.append(record)
+
+            # print(record)
+            # exit()
+            
             #break
         #break
     return dataset_dicts
