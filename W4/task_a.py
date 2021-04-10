@@ -23,6 +23,8 @@ from detectron2.engine import DefaultPredictor
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from src import utils
 
+### 158.109.75.51 –p 55022
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Task b")

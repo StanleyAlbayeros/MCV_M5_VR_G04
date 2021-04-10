@@ -68,6 +68,7 @@ DatasetCatalog.register("balloon_train", lambda: getDicts.register_helper("../W4
 
 balloon_metadata = MetadataCatalog.get("balloon_train")
 DatasetCatalog.register("balloon_val", lambda: getDicts.register_helper("../W4/datasetpkl/val_kitti_mots.pkl",True))
+
 balloon_metadata2 = MetadataCatalog.get("balloon_val")
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
