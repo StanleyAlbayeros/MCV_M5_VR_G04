@@ -168,6 +168,10 @@ def get_dicts(dataset, images_path, extension):
                     # segmentation.append(contour)
                     if len(contour) > 4:
                         segmentation.append(contour)
+
+                if not segmentation:
+                    continue
+                
                 # if len(segmentation) == 0:
                 #     continue
                     # End: convert rle to poly
