@@ -1,4 +1,5 @@
 {
-    "python.pythonPath": "/home/drkztan/anaconda3/envs/detect2/bin/python",
-    "python.formatting.provider": "black"
+    "python.pythonPath": "/home/drkztan/anaconda3/envs/det2/bin/python",
+    "python.formatting.provider": "black",
+    "jupyter.jupyterServerType": "local"
 }

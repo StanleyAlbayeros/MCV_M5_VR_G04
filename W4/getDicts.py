@@ -11,12 +11,13 @@ from detectron2.structures import BoxMode
 from PIL import Image
 from tqdm import tqdm
 
-
+from src import config
 import io_tools
 
 """
 Save catalogues to pkl
 """
+
 
 def catalog_to_pkl(catalog, path):
     with open(path, "wb") as f:
@@ -36,46 +37,47 @@ def pkl_to_catalog(path):
 Split para train i val 
 """
 
-def split_data_mots_challenge(db_path,img_path,train_pkl, val_pkl, v= True):
+
+def generate_motschallenge_pkls(db_path, img_path, train_pkl, val_pkl):
     train_dataset = {}
-    val_dataset = {}
+
     for file in sorted(os.listdir(db_path + "/train/instances_txt")):
-        annotations = io_tools.load_txt(db_path+"/train/instances_txt/"+file)
-        train_samples = int(np.floor(len(annotations) * 0.6))
-        val_samples = int(np.floor(len(annotations) * 0.4))
+        annotations = io_tools.load_txt(db_path + "/train/instances_txt/" + file)
+        train_samples = len(annotations)
         train = {}
-        val = {}
-        for key in range(1,train_samples):
+        for key in range(1, train_samples):
             train[key] = annotations[key]
-        for key in range(train_samples,val_samples):
-            val[key] = annotations[key]
+
         train_dataset[f"{file[0:-4]}"] = train
-        val_dataset[f"{file[0:-4]}"] = val
+
     if os.path.exists(train_pkl):
-        if v: print(colorama.Fore.BLUE + "\t Found train pkl, loading")
+
+        if config.verbose:
+            print(colorama.Fore.BLUE + f"\t Found {train_pkl} pkl, loading")
         train_catalog = pkl_to_catalog(train_pkl)
+
     else:
-        if v: print(colorama.Fore.BLUE + "\t Generating train annotations")
+
+        if config.verbose:
+            print(colorama.Fore.BLUE + "\t Generating train annotations")
         train_catalog = get_dicts(train_dataset, img_path, ".jpg")
-        if v: print(colorama.Fore.MAGENTA + "\t\tSaving train pkl")
-        catalog_to_pkl(train_catalog,train_pkl)
+
+        if config.verbose:
+            print(colorama.Fore.MAGENTA + f"\t\tSaving {train_pkl} pkl")
+        catalog_to_pkl(train_catalog, train_pkl)
+
         del train_catalog
-    if os.path.exists(val_pkl):
-        if v: print(colorama.Fore.BLUE + "\t Found val pkl, loading")
-        val_catalog = pkl_to_catalog(val_pkl)
-    else:
-        if v: print(colorama.Fore.BLUE + "\t Generating val annotations")
-        val_catalog = get_dicts(val_dataset, img_path, ".jpg")
-        if v: print(colorama.Fore.MAGENTA + "\t\tSaving val pkl")
-        catalog_to_pkl(val_catalog,val_pkl)
-        del val_catalog
 
 
-
-def split_data_kitti_mots(
-    base_path, images_path, train_pkl, val_pkl,v =False, extension=".png", random_train_test=False
+def generate_kitti_mots_pkls(
+    base_path,
+    images_path,
+    train_pkl,
+    val_pkl,
+    extension=".png",
+    random_train_test=False,
 ):
-    training = [2,6,7,8,10,13,14,16,18]
+    training = [2, 6, 7, 8, 10, 13, 14, 16, 18]
     training = np.char.zfill(list(map(str, training)), 4)
 
     # training = ["2","6","7","8","10","13","14","16","18"]
@@ -96,38 +98,58 @@ def split_data_kitti_mots(
             val_dataset[f"{file[0:-4]}"] = annotations
 
     if os.path.exists(train_pkl):
-        if v: print(colorama.Fore.BLUE + "\tFound train pkl, loading")
+        if config.verbose:
+            print(colorama.Fore.BLUE + f"\tFound {train_pkl} pkl, loading")
         train_catalog = pkl_to_catalog(train_pkl)
     else:
-        if v: print(colorama.Fore.BLUE + "\tGenerating kitti mots train for : 2,6,7,8,10,13,14,16,18")
+        if config.verbose:
+            print(
+                colorama.Fore.BLUE
+                + "\tGenerating kitti mots train for : 2,6,7,8,10,13,14,16,18 at: \n"
+                + f"\t\t\t {train_pkl}"
+            )
         train_catalog = get_dicts(train_dataset, images_path, extension)
-        if v: print(colorama.Fore.MAGENTA + "\t\tSaving train pkl")
+        if config.verbose:
+            print(colorama.Fore.MAGENTA + f"\t\tSaving {train_pkl} pkl")
         catalog_to_pkl(train_catalog, train_pkl)
         del train_catalog
 
     if os.path.exists(val_pkl):
-        if v: print(colorama.Fore.BLUE + "\tFound val pkl, loading")
+        if config.verbose:
+            print(colorama.Fore.BLUE + f"\tFound {val_pkl} pkl, loading")
         val_catalog = pkl_to_catalog(val_pkl)
     else:
-        if v: print(colorama.Fore.BLUE + "\tGenerating val annotations")
+        if config.verbose:
+            print(
+                colorama.Fore.BLUE
+                + "\tGenerating kitti mots val annotations"
+                + f"\t\t\t {val_pkl}"
+            )
         val_catalog = get_dicts(val_dataset, images_path, extension)
-        if v: print(colorama.Fore.MAGENTA + "\t\tSaving val pkl")
+        if config.verbose:
+            print(colorama.Fore.MAGENTA + f"\t\tSaving {val_pkl} pkl")
         catalog_to_pkl(val_catalog, val_pkl)
         del val_catalog
 
 
+def generate_combined_pkl(path):
+    for file in sorted(os.listdir(path)):
+        print(file)
+    print(config.pkl_path)
+    exit()
 
-def register_helper(path, v):
+
+def register_helper(path):
     if os.path.exists(path):
-        if v: print(colorama.Fore.CYAN + f"Retreiving information from {path}")
+        if config.verbose:
+            print(colorama.Fore.CYAN + f"Retreiving information from {path}")
         catalog = pkl_to_catalog(path)
     return catalog
+
 
 """
 Obtención de las boxes de cada imagen (KITTI-MOTS)
 """
-
-
 
 
 def get_dicts(dataset, images_path, extension):
@@ -138,7 +160,7 @@ def get_dicts(dataset, images_path, extension):
     folder_id = []
 
     for folder, annos in tqdm(dataset.items(), desc="Folder loop", colour="Cyan"):
-    # for idx, dir in tqdm(enumerate(images_path), desc = "Folder loop", colour="Cyan"):
+        # for idx, dir in tqdm(enumerate(images_path), desc = "Folder loop", colour="Cyan"):
         # print(folder)
         # exit()
         for key, anno in tqdm(annos.items(), desc="Annons loop", colour="Magenta"):
@@ -158,7 +180,6 @@ def get_dicts(dataset, images_path, extension):
 
                 category_id = instance.class_id
 
-
                 # if category_id == 1 or category_id == 2:
                 bbox = pycocotools.mask.toBbox(instance.mask)
                 mask = rletools.decode(instance.mask)
@@ -170,11 +191,11 @@ def get_dicts(dataset, images_path, extension):
 
                 if not segmentation:
                     continue
-                
+
                 # if len(segmentation) == 0:
                 #     continue
-                    # End: convert rle to poly
-                    # print (segmentation)
+                # End: convert rle to poly
+                # print (segmentation)
 
                 # thing_classes = ["Person", "Other", "Car"]
                 if category_id == 1 or category_id == 2:
@@ -187,17 +208,18 @@ def get_dicts(dataset, images_path, extension):
                         ],
                         "bbox_mode": BoxMode.XYWH_ABS,
                         # "type": 'Car' if category_id==2 else 'Person',
-                        "category_id": 2 if category_id==1 else 0,
+                        "category_id": 2 if category_id == 1 else 0,
                         "segmentation": segmentation,
+                        "isCrowd": 0,
                     }
                     objs.append(obj)
-                    
+
             record["annotations"] = objs
             dataset_dicts.append(record)
 
             # print(record)
             # exit()
-            
-            #break
-        #break
+
+            # break
+        # break
     return dataset_dicts

@@ -2,46 +2,36 @@ import getDicts
 import numpy as np
 import os
 import io_tools
-
-
-db_path = "../datasets/MOTSChallenge"
-img_path = "../datasets/MOTSChallenge/train/images"
-
-db_path2 = "../datasets/KITTI-MOTS"
-masks_path2 = "../datasets/KITTI-MOTS/instances"
-img_path2 = "../datasets/KITTI-MOTS/training/image_02"
+from src import config
+import getDicts
 
 
 pkl_path = "../W4/datasetpkl"
-train_pkl = pkl_path + "/train.pkl"
-val_pkl = pkl_path + "/val.pkl"
+train_pkl_kitti_mots = f"{pkl_path}/train/train_kitti_mots.pkl"
+val_pkl_kitti_mots = f"{pkl_path}/val/val_kitti_mots.pkl"
+val_pkl_mots_challenge = f"{pkl_path}/val/val_mots_challenge.pkl"
+train_combo = f"{pkl_path}/train/train_combo.pkl"
+val_combo = f"{pkl_path}/val/val_combo.pkl"
+train_pkl_mots_challenge = f"{pkl_path}/train/train_mots_challenge.pkl"
+thing_classes = ["Person", "Other", "Car"]
 
-def split_data(base_path):
-    training = ["2", "6", "7", "8", "10", "13", "14", "16", "18"]
-    training = np.char.zfill(training, 4)
+# txt_results_path = f"{output_path}/txt_results"
+base_dir = "../resources"
+db_path_kitti_mots = f"{base_dir}/KITTI-MOTS"
+db_path_mots_challenge = f"{base_dir}/MOTSChallenge"
+masks_path_kitti_mots = f"{db_path_kitti_mots}/instances"
+imgs_path_kitti_mots = f"{db_path_kitti_mots}/training/image_02"
+masks_path_mots_challenge = f"{db_path_mots_challenge}/instances"
+imgs_path_mots_challenge = f"{db_path_mots_challenge}/train/images"
 
-    train_dataset = {}
-    val_dataset = {}
+# getDicts.generate_motschallenge_pkls(
+#     db_path_mots_challenge,
+#     imgs_path_mots_challenge,
+#     train_pkl_mots_challenge,
+#     val_pkl_mots_challenge,
+#     True,
+# )
+config.init_workspace(True, "lul")
 
-    for file in sorted(os.listdir(base_path + "/instances_txt")):
-        annotations = io_tools.load_txt(base_path + "/instances_txt/" + file)
-        if file[0:-4] in training:
-            train_dataset[f"{file[0:-4]}"] = annotations
-        else:
-            val_dataset[f"{file[0:-4]}"] = annotations
-    return train_dataset,val_dataset
+getDicts.generate_combined_pkl(pkl_path)
 
-#mots-challenge
-"""
-train = getDicts.split_data_mots_challenge(db_path,img_path,train_pkl,val_pkl)
-
-print(train)"""
-
-##kitti-mots
-train,val = split_data(db_path2)
-train_data = getDicts.get_dicts(train,img_path2,".png")
-print(train_data)
-
-
-"""data_train = getDicts.get_dicts(train,img_path)
-print(data_train)"""
