@@ -77,22 +77,22 @@ def generate_kitti_mots_pkls(
     extension=".png",
     random_train_test=False,
 ):
-    training = [2, 6, 7, 8, 10, 13, 14, 16, 18]
-    training = np.char.zfill(list(map(str, training)), 4)
+    validation = [2, 6, 7, 8, 10, 13, 14, 16, 18]
+    validation = np.char.zfill(list(map(str, validation)), 4)
 
     # training = ["2","6","7","8","10","13","14","16","18"]
     # training = np.char.zfill(training, 4)
 
     if random_train_test:
         intlist = random.sample(range(0, 20), 9)
-        training = np.char.zfill(list(map(str, intlist)), 4)
+        validation = np.char.zfill(list(map(str, intlist)), 4)
     raw_dicts = []
     train_dataset = {}
     val_dataset = {}
 
     for file in sorted(os.listdir(base_path + "/instances_txt")):
         annotations = io_tools.load_txt(base_path + "/instances_txt/" + file)
-        if file[0:-4] in training:
+        if file[0:-4] not in validation:
             train_dataset[f"{file[0:-4]}"] = annotations
         else:
             val_dataset[f"{file[0:-4]}"] = annotations
@@ -210,7 +210,7 @@ def get_dicts(dataset, images_path, extension):
                         # "type": 'Car' if category_id==2 else 'Person',
                         "category_id": 2 if category_id == 1 else 0,
                         "segmentation": segmentation,
-                        "isCrowd": 0,
+                        # "isCrowd": 0,
                     }
                     objs.append(obj)
 

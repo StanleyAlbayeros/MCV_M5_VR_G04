@@ -12,8 +12,9 @@ import colorama
 import random
 from src import config
 import logging
+import time
 
-from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
+from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader, DatasetMapper
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
@@ -80,12 +81,13 @@ def use_model(
     cfg.OUTPUT_DIR = f"{current_output_dir}"
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
     cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
-    cfg.DATALOADER.NUM_WORKERS = 8
+    cfg.DATALOADER.NUM_WORKERS = 4
     # cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
     # cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
     # cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8
     predictor = DefaultPredictor(cfg)
 
+    start = time.time()
     if geninference:
         if config.verbose:
             print(colorama.Fore.LIGHTMAGENTA_EX + "\tInference start")
@@ -101,27 +103,29 @@ def use_model(
             distributed=True,
         )
 
-        # val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
+        val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
 
-        val_loader = build_detection_test_loader(
-            cfg,
-            cfg.DATASETS.TEST[0],
-            DatasetMapper(
-                cfg,
-                True,
-            ),
-        )
+        # val_loader = build_detection_test_loader(
+        #     cfg,
+        #     cfg.DATASETS.TEST[0],
+        #     DatasetMapper(
+        #         cfg,
+        #         True,
+        #     ),
+        # )
 
         results = inference_on_dataset(predictor.model, val_loader, evaluator)
-
-        print(f"{model_name} #RESULTS#")
+        end = time.time()
+        time_elapsed = end - start
+        print(f"{model_name} #RESULTS# in {time_elapsed} seconds")
         print(results)
-        print(f"{model_name} #RESULTS#")
+        print(f"{model_name} #RESULTS# in {time_elapsed} seconds")
 
         txt_results_path = f"{current_output_dir}/{config.txt_results_path}"
         config.create_txt_results_path(txt_results_path)
         with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
             writer.write(str(results))
+            writer.write(f"\n Time elapsed: {time_elapsed:2f}")
             if config.verbose:
                 print(colorama.Fore.YELLOW + f"{results}")
         if config.verbose:

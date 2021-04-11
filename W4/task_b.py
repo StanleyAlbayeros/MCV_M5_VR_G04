@@ -72,7 +72,7 @@ def use_model(
     geninference=False,
     generate_img=False,
 ):
-    current_output_dir = f"{config.output_path}/models/{model_group}/{model_name}"
+    current_output_dir = f"{config.output_path}/models/COCO_KITTI/{model_name}"
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
     os.makedirs(current_output_dir, exist_ok=True)
@@ -89,7 +89,7 @@ def use_model(
     ######################################################################
 
     # # Let training initialize from model zoo
-    cfg.SOLVER.IMS_PER_BATCH = 4
+    cfg.SOLVER.IMS_PER_BATCH = 8
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
     cfg.SOLVER.MAX_ITER = 600  # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
     cfg.SOLVER.STEPS = []  # do not decay learning rate
@@ -97,7 +97,7 @@ def use_model(
         1024  # faster, and good enough for this toy dataset (default: 512)
     )
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3 
-    cfg.TEST.EVAL_PERIOD = 20
+""" # cfg.TEST.EVAL_PERIOD = 20
     # cfg.SOLVER.CHECKPOINT_PERIOD = 100
 
     # cfg.INPUT.MIN_SIZE_TEST = 700
@@ -105,29 +105,29 @@ def use_model(
     # cfg.INPUT.MAX_SIZE_TRAIN = 600
     # cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
 
-    tasks = ("bbox", "segm")
-    class MyTrainer(DefaultTrainer):
-        @classmethod
-        def build_evaluator(cls, cfg, dataset_name, output_folder=None):
-            if output_folder is None:
-                output_folder = cfg.OUTPUT_DIR
-            return COCOEvaluator(dataset_name, tasks, True, output_folder)
+    # tasks = ("bbox", "segm")
+    # class MyTrainer(DefaultTrainer):
+    #     @classmethod
+    #     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
+    #         if output_folder is None:
+    #             output_folder = cfg.OUTPUT_DIR
+    #         return COCOEvaluator(dataset_name, tasks, True, output_folder)
                         
-        def build_hooks(self):
-            hooks = super().build_hooks()
-            hooks.insert(-1,LossEvalHook.LossEvalHook(
-                cfg.TEST.EVAL_PERIOD,
-                self.model,
-                build_detection_test_loader(
-                    self.cfg,
-                    self.cfg.DATASETS.TEST[0],
-                    DatasetMapper(self.cfg,True, )
-                )
-            ))
-            return hooks
+    #     def build_hooks(self):
+    #         hooks = super().build_hooks()
+    #         hooks.insert(-1,LossEvalHook.LossEvalHook(
+    #             cfg.TEST.EVAL_PERIOD,
+    #             self.model,
+    #             build_detection_test_loader(
+    #                 self.cfg,
+    #                 self.cfg.DATASETS.TEST[0],
+    #                 DatasetMapper(self.cfg,True, )
+    #             )
+    #         ))
+    #         return hooks """
             
-    # trainer = DefaultTrainer(cfg)
-    trainer = MyTrainer(cfg)
+    # trainer = MyTrainer(cfg)
+    trainer = DefaultTrainer(cfg)
     trainer.resume_or_load(resume=False)
     if config.verbose: print(f"\n\n\nUsing config: {cfg.dump()}\n\n\n")
     trainer.train()
@@ -166,7 +166,7 @@ def use_model(
         print(results)
         print(f"{model_name} #RESULTS#")
         
-        txt_results_path = f"{config.output_path}/models/{model_group}/txt_results"
+        txt_results_path = f"{config.output_path}/txt_results/{model_group}"
         config.create_txt_results_path(txt_results_path)
         with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
             writer.write(str(results))
