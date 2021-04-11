@@ -1,28 +1,31 @@
 import argparse
+import logging
 import os
 import pickle
+import random
+import sys
+import time
 
+import colorama
 import cv2
 import matplotlib.pyplot as plt
 import pycocotools.mask as rletools
-import getDicts
-from pycocotools import coco
-import sys
-import colorama
-import random
-from src import config
-import logging
-import time
-
-from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader, DatasetMapper
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
-from detectron2.utils.visualizer import Visualizer
-from detectron2.modeling import build_model
-from detectron2.engine import DefaultTrainer
-from detectron2.engine import DefaultPredictor
+from detectron2.data import (
+    DatasetCatalog,
+    DatasetMapper,
+    MetadataCatalog,
+    build_detection_test_loader,
+)
+from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
-from src import imgUtils
+from detectron2.modeling import build_model
+from detectron2.utils.visualizer import Visualizer
+from pycocotools import coco
+
+import getDicts
+from src import config, imgUtils
 
 ### 158.109.75.51 –p 55022
 
@@ -94,7 +97,10 @@ def use_model(
 
         # build = build_model(cfg)
         # conda env export > detect2.yml
-        tasks = ("bbox", "segm", )
+        tasks = (
+            "bbox",
+            "segm",
+        )
         evaluator = COCOEvaluator(
             cfg.DATASETS.TEST[0],
             tasks,
@@ -121,8 +127,9 @@ def use_model(
         print(results)
         print(f"{model_name} #RESULTS# in {time_elapsed} seconds")
 
-        txt_results_path = f"{current_output_dir}/{config.txt_results_path}"
+        txt_results_path = f"{config.output_path}/txt_results/{model_group}"
         config.create_txt_results_path(txt_results_path)
+
         with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
             writer.write(str(results))
             writer.write(f"\n Time elapsed: {time_elapsed:2f}")

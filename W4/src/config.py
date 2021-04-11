@@ -81,28 +81,28 @@ def init_workspace(v=False, _python_filename=""):
         "R50-FPN_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml",
         "R50-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
         "R101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
-        "City-R50-FPN" : "Cityscapes/mask_rcnn_R_50_FPN.yaml",
         "X101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml",
-        "R50-C4_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_1x.yaml",
         "R50-DC5_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_DC5_1x.yaml",
-        "R50-C4_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml",
         "R50-DC5_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_DC5_3x.yaml",
-        "R101-C4_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_C4_3x.yaml",
         "R101-DC5_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_DC5_3x.yaml",
+        "R50-C4_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_1x.yaml",
+        "R50-C4_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml",
+        "R101-C4_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_C4_3x.yaml",
+        "City-R50-FPN" : "Cityscapes/mask_rcnn_R_50_FPN.yaml",
         
     }
     mask_rcnn_results = {
         "R50-FPN_x1" : "",
         "R50-FPN_x3" : "",
         "R101-FPN_x3" : "",
-        "City-R50-FPN" : "",
         "X101-FPN_x3" : "",
-        "R50-C4_x1" : "",
         "R50-DC5_x1" : "",
-        "R50-C4_x3" : "",
         "R50-DC5_x3" : "",
-        "R101-C4_x3" : "",
         "R101-DC5_x3" : "",
+        "R50-C4_x1" : "",
+        "R50-C4_x3" : "",
+        "R101-C4_x3" : "",
+        "City-R50-FPN" : "",
     }
 
     cityscapes_models = {

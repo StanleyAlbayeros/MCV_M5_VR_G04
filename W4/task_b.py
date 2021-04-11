@@ -1,26 +1,32 @@
 import argparse
+import logging
 import os
 import pickle
+import random
+import sys
+import time
 
+import colorama
 import cv2
 import matplotlib.pyplot as plt
 import pycocotools.mask as rletools
-import getDicts
-from pycocotools import coco
-import sys
-import colorama
-import random
-from src import config
-import logging
-
-from detectron2.data import DatasetMapper, DatasetCatalog, MetadataCatalog, build_detection_test_loader
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
-from detectron2.utils.visualizer import Visualizer
-from detectron2.modeling import build_model
+from detectron2.data import (
+    DatasetCatalog,
+    DatasetMapper,
+    MetadataCatalog,
+    build_detection_test_loader,
+)
 from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
-from src import imgUtils, LossEvalHook, graphicUtils
+from detectron2.modeling import build_model
+from detectron2.utils.visualizer import Visualizer
+from pycocotools import coco
+
+import getDicts
+from src import LossEvalHook, config, graphicUtils, imgUtils
+
 ### ssh group04@158.109.75.51 -p 55022
 
 
@@ -81,7 +87,6 @@ def use_model(
     cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
     cfg.DATASETS.TRAIN = ("KITTI_MOTS_training",)
     cfg.DATALOADER.NUM_WORKERS = 8
-    
 
     ######################################################################
     ######################################################################
@@ -96,45 +101,18 @@ def use_model(
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = (
         256  # faster, and good enough for this toy dataset (default: 512)
     )
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3 
-""" # cfg.TEST.EVAL_PERIOD = 20
-    # cfg.SOLVER.CHECKPOINT_PERIOD = 100
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(config.thing_classes)
 
-    # cfg.INPUT.MIN_SIZE_TEST = 700
-    # cfg.INPUT.MAX_SIZE_TEST = 600
-    # cfg.INPUT.MAX_SIZE_TRAIN = 600
-    # cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
-
-    # tasks = ("bbox", "segm")
-    # class MyTrainer(DefaultTrainer):
-    #     @classmethod
-    #     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
-    #         if output_folder is None:
-    #             output_folder = cfg.OUTPUT_DIR
-    #         return COCOEvaluator(dataset_name, tasks, True, output_folder)
-                        
-    #     def build_hooks(self):
-    #         hooks = super().build_hooks()
-    #         hooks.insert(-1,LossEvalHook.LossEvalHook(
-    #             cfg.TEST.EVAL_PERIOD,
-    #             self.model,
-    #             build_detection_test_loader(
-    #                 self.cfg,
-    #                 self.cfg.DATASETS.TEST[0],
-    #                 DatasetMapper(self.cfg,True, )
-    #             )
-    #         ))
-    #         return hooks """
-            
+    start = time.time()
     # trainer = MyTrainer(cfg)
     trainer = DefaultTrainer(cfg)
     trainer.resume_or_load(resume=False)
-    if config.verbose: print(f"\n\n\nUsing config: {cfg.dump()}\n\n\n")
+    if config.verbose:
+        print(f"\n\n\nUsing config: {cfg.dump()}\n\n\n")
+
     trainer.train()
 
-    cfg.MODEL.WEIGHTS = os.path.join(
-        cfg.OUTPUT_DIR, "model_final.pth"
-    )  
+    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")
     # path to the model we just trained
     # cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
     predictor = DefaultPredictor(cfg)
@@ -156,18 +134,21 @@ def use_model(
             tasks,
             use_fast_impl=False,
             output_dir=f"{current_output_dir}",
-            distributed=True
+            distributed=True,
         )
         val_loader = build_detection_test_loader(cfg, "KITTI_MOTS_val")
 
         results = inference_on_dataset(predictor.model, val_loader, evaluator)
-        
+
         print(f"{model_name} #RESULTS#")
         print(results)
         print(f"{model_name} #RESULTS#")
-        
+
+        end = time.time()
+        time_elapsed = end - start
         txt_results_path = f"{config.output_path}/txt_results/{model_group}"
         config.create_txt_results_path(txt_results_path)
+
         with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
             writer.write(str(results))
             writer.write(f"\n\n{cfgdmp}")
@@ -232,12 +213,12 @@ if __name__ == "__main__":
 
     if config.verbose:
         print(colorama.Fore.LIGHTMAGENTA_EX + "\nGetting dataset train val split")
-        
+
     getDicts.generate_kitti_mots_pkls(
         config.db_path_kitti_mots,
         config.imgs_path_kitti_mots,
         config.train_pkl_kitti_mots,
-        config.val_pkl_kitti_mots
+        config.val_pkl_kitti_mots,
     )
     print(f"Train and val datasets generated")
 
@@ -275,7 +256,7 @@ if __name__ == "__main__":
         config.mask_rcnn_results[f"{model_name}"] = use_model(
             model_name=model_name,
             model_url=model_url,
-            model_group = "COCO",
+            model_group="COCO",
             training_dataset=train,
             validation_dataset=val,
             metadata=KITTI_MOTS_metadata,
