@@ -94,7 +94,7 @@ def use_model(
 
         # build = build_model(cfg)
         # conda env export > detect2.yml
-        tasks = ("bbox", "segm")
+        tasks = ("bbox", "segm", )
         evaluator = COCOEvaluator(
             cfg.DATASETS.TEST[0],
             tasks,

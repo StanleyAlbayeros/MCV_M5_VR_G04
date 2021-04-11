@@ -180,25 +180,19 @@ def get_dicts(dataset, images_path, extension):
 
                 category_id = instance.class_id
 
-                # if category_id == 1 or category_id == 2:
-                bbox = pycocotools.mask.toBbox(instance.mask)
-                mask = rletools.decode(instance.mask)
-                contours, _ = cv2.findContours(
-                    (mask).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
-                )
-                segmentation = [[int(i) for i in c.flatten()] for c in contours]
-                segmentation = [s for s in segmentation if len(s) >= 6]
-
-                if not segmentation:
-                    continue
-
-                # if len(segmentation) == 0:
-                #     continue
-                # End: convert rle to poly
-                # print (segmentation)
-
                 # thing_classes = ["Person", "Other", "Car"]
                 if category_id == 1 or category_id == 2:
+                    bbox = pycocotools.mask.toBbox(instance.mask)
+                    mask = rletools.decode(instance.mask)
+                    contours, _ = cv2.findContours(
+                        (mask).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+                    )
+                    segm = [[int(i) for i in c.flatten()] for c in contours]
+                    segm = [s for s in segm if len(s) >= 6]
+
+                    if not segm:
+                        continue
+
                     obj = {
                         "bbox": [
                             float(bbox[0]),
@@ -207,12 +201,15 @@ def get_dicts(dataset, images_path, extension):
                             float(bbox[3]),
                         ],
                         "bbox_mode": BoxMode.XYWH_ABS,
-                        # "type": 'Car' if category_id==2 else 'Person',
+                        "type": 'Car' if category_id==2 else 'Person',
                         "category_id": 2 if category_id == 1 else 0,
-                        "segmentation": segmentation,
+                        "segmentation": instance.mask,
                         # "isCrowd": 0,
                     }
                     objs.append(obj)
+                    if obj["category_id"] > 2:
+                        print("WTF")
+                    # print(segm)
 
             record["annotations"] = objs
             dataset_dicts.append(record)

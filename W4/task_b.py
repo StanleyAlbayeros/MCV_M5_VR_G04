@@ -91,10 +91,10 @@ def use_model(
     # # Let training initialize from model zoo
     cfg.SOLVER.IMS_PER_BATCH = 8
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 600  # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    cfg.SOLVER.MAX_ITER = 300  # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
     cfg.SOLVER.STEPS = []  # do not decay learning rate
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = (
-        1024  # faster, and good enough for this toy dataset (default: 512)
+        256  # faster, and good enough for this toy dataset (default: 512)
     )
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3 
 """ # cfg.TEST.EVAL_PERIOD = 20
