@@ -7,7 +7,7 @@ from numpy import nan
 import csv
 
 # This string is slightly different from your sample which had an extra bracket
-RESULTS_PATH="../txt_results/"
+RESULTS_PATH="../outputs/task_b/txt_results/COCO_KITTI/"
 def read_file(file):
     f = open(os.path.join(RESULTS_PATH, file), "r")
     line = f.readline()
@@ -16,16 +16,16 @@ def read_file(file):
     match = re.search(r'^OrderedDict\((.+)\)\s*$', line)
     data = match.group(1)
 
-    match = re.search(r'Time elapsed: (.+)\s*$', line2)
-    et = match.group(1)
+    #match = re.search(r'Time elapsed: (.+)\s*$', line2)
+    #et = match.group(1)
     # This allows safe evaluation: data can only be a basic data structure
-    return OrderedDict(eval(data)), et
+    return OrderedDict(eval(data)), line2
 
 
 onlyfiles = [f for f in os.listdir(RESULTS_PATH) if os.path.isfile(os.path.join(RESULTS_PATH, f))]
 col = ["", "AP", "AP50", "AP75", "APs", "APm", "APl", "AP-Person", "AP-Other", "AP-Car", "Elapsed Time", "ratio AP:Time", "ratio AP50:Time","ratio Car:Time","ratio Person:Time"]
 
-fp = open(os.path.join(RESULTS_PATH, "task_a_results.csv"), "w")
+fp = open(os.path.join(RESULTS_PATH, "task_b_results.csv"), "w")
 writer = csv.writer(fp, delimiter='\t')
 bboxes=[]
 segments=[]
