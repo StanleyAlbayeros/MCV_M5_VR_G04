@@ -65,7 +65,7 @@ Tasks:
 [Google Slides Week 4](https://docs.google.com/presentation/d/1M6MtlGSnmqRxuT2TkZ-Tu5YOu-TvQ4f1bfRBS3Je5NI/edit#slide=id.gc95a16a8e7_0_0)
 (We filled in the slides linked in the instructions PDF)
 
-[Read updated PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/W4/Paper/main.pdf)
+[Read updated PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/W4/paper/main.pdf)
 
 [Go to updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/W4/Paper)
 
