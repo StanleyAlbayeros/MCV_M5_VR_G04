@@ -127,7 +127,7 @@ def use_model(
         print(results)
         print(f"{model_name} #RESULTS# in {time_elapsed} seconds")
 
-        txt_results_path = f"{config.output_path}/txt_results/{model_group}"
+        txt_results_path = f"{config.txt_results_path}"
         config.create_txt_results_path(txt_results_path)
 
         with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
@@ -194,26 +194,21 @@ if __name__ == "__main__":
 
     if config.verbose:
         print(colorama.Fore.LIGHTMAGENTA_EX + "\nGetting dataset train val split")
-    getDicts.generate_kitti_mots_pkls(
-        config.db_path_kitti_mots,
-        config.imgs_path_kitti_mots,
-        config.train_pkl_kitti_mots,
-        config.val_pkl_kitti_mots,
-    )
+    
+    train, val = getDicts.generate_datasets(mots)
+
     print(f"Train and val datasets generated")
 
     DatasetCatalog.register(
         "KITTI_MOTS_training",
-        lambda: getDicts.register_helper(config.train_pkl_kitti_mots),
+        lambda: getDicts.register_helper(config.training_pkl),
     )
     MetadataCatalog.get("KITTI_MOTS_training").set(thing_classes=config.thing_classes)
 
     DatasetCatalog.register(
-        "KITTI_MOTS_val", lambda: getDicts.register_helper(config.val_pkl_kitti_mots)
+        "KITTI_MOTS_val", lambda: getDicts.register_helper(config.validation_pkl)
     )
     MetadataCatalog.get("KITTI_MOTS_val").set(thing_classes=config.thing_classes)
-    train = getDicts.register_helper(config.train_pkl_kitti_mots)
-    val = getDicts.register_helper(config.val_pkl_kitti_mots)
 
     if config.verbose:
         print(colorama.Fore.LIGHTMAGENTA_EX + "Done getting dataset train val split\n")

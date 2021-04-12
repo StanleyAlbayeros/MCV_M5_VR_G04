@@ -10,21 +10,11 @@ import csv
 import json
 
 # This string is slightly different from your sample which had an extra bracket
-<<<<<<< HEAD
-RESULTS_PATH = "../task_a_txt/"
-
-
-def read_file(file_path):
-    f = open(file_path), "r")
-    line = f.read()
-    match = re.search(r"^OrderedDict\((.+)\)\s*$", line)
-=======
-RESULTS_PATH="../task_a_txt/"
+RESULTS_PATH="../outputs/task_a/txt_results"
 def read_file(file):
     f = open(os.path.join(RESULTS_PATH, file), "r")
     line = f.readline()
     match = re.search(r'^OrderedDict\((.+)\)\s*$', line)
->>>>>>> main
     data = match.group(1)
     # This allows safe evaluation: data can only be a basic data structure
     return OrderedDict(eval(data))
@@ -51,29 +41,16 @@ col = [
     "AP-Car",
 ]
 
-<<<<<<< HEAD
-fp = open("bbox.csv", "w")
-writer = csv.writer(fp, delimiter="\t")
-writer.writerow(col)
-
-fp1 = open("segm.csv", "w")
-writer1 = csv.writer(fp1, delimiter="\t")
-=======
 fp=open(os.path.join(RESULTS_PATH, "bbox.csv"), "w")
 writer = csv.writer(fp, delimiter='\t')
 writer.writerow(col)
 
 fp1=open(os.path.join(RESULTS_PATH, "segm.csv"), "w")
 writer1 = csv.writer(fp1, delimiter='\t')
->>>>>>> main
 writer1.writerow(col)
 
 for file in onlyfiles:
     content = read_file(file)
-<<<<<<< HEAD
-    writer.writerow([file.replace(".txt", "")] + list(content["bbox"].values()))
-    writer1.writerow([file.replace(".txt", "")] + list(content["segm"].values()))
-=======
     auxb=[]
     auxs=[]
     for i in list(content["bbox"].values()):
@@ -83,4 +60,3 @@ for file in onlyfiles:
 
     writer.writerow([file.replace(".txt", "")]+list(auxb))
     writer1.writerow([file.replace(".txt", "")]+list(auxs))
->>>>>>> main

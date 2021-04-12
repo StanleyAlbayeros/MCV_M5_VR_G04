@@ -38,8 +38,15 @@ Split para train i val
 """
 
 
-def generate_motschallenge_pkls(db_path, img_path, train_pkl, val_pkl):
+def generate_motschallenge_pkls():
+
+    db_path=config.db_path_mots_challenge
+    img_path=config.imgs_path_mots_challenge
+    train_pkl=config.train_pkl_mots_challenge
+
+
     train_dataset = {}
+    train_catalog = []
 
     for file in sorted(os.listdir(db_path + "/train/instances_txt")):
         annotations = io_tools.load_txt(db_path + "/train/instances_txt/" + file)
@@ -65,18 +72,19 @@ def generate_motschallenge_pkls(db_path, img_path, train_pkl, val_pkl):
         if config.verbose:
             print(colorama.Fore.MAGENTA + f"\t\tSaving {train_pkl} pkl")
         catalog_to_pkl(train_catalog, train_pkl)
-
-        del train_catalog
-
+    
+    return train_catalog
 
 def generate_kitti_mots_pkls(
-    base_path,
-    images_path,
-    train_pkl,
-    val_pkl,
     extension=".png",
     random_train_test=False,
 ):
+
+    base_path=config.db_path_kitti_mots
+    images_path=config.imgs_path_kitti_mots
+    train_pkl=config.train_pkl_kitti_mots
+    val_pkl=config.val_pkl_kitti_mots
+
     validation = [2, 6, 7, 8, 10, 13, 14, 16, 18]
     validation = np.char.zfill(list(map(str, validation)), 4)
 
@@ -89,6 +97,8 @@ def generate_kitti_mots_pkls(
     raw_dicts = []
     train_dataset = {}
     val_dataset = {}
+    train_catalog = []
+    val_catalog = []
 
     for file in sorted(os.listdir(base_path + "/instances_txt")):
         annotations = io_tools.load_txt(base_path + "/instances_txt/" + file)
@@ -112,7 +122,6 @@ def generate_kitti_mots_pkls(
         if config.verbose:
             print(colorama.Fore.MAGENTA + f"\t\tSaving {train_pkl} pkl")
         catalog_to_pkl(train_catalog, train_pkl)
-        del train_catalog
 
     if os.path.exists(val_pkl):
         if config.verbose:
@@ -129,14 +138,8 @@ def generate_kitti_mots_pkls(
         if config.verbose:
             print(colorama.Fore.MAGENTA + f"\t\tSaving {val_pkl} pkl")
         catalog_to_pkl(val_catalog, val_pkl)
-        del val_catalog
 
-
-def generate_combined_pkl(path):
-    for file in sorted(os.listdir(path)):
-        print(file)
-    print(config.pkl_path)
-    exit()
+    return train_catalog, val_catalog
 
 
 def register_helper(path):
@@ -145,6 +148,21 @@ def register_helper(path):
             print(colorama.Fore.CYAN + f"Retreiving information from {path}")
         catalog = pkl_to_catalog(path)
     return catalog
+
+def generate_datasets(mots=False):
+    training, validation = generate_kitti_mots_pkls()
+
+    if mots:
+        training.append(generate_motschallenge_pkls())
+
+    if not os.path.exists(config.training_pkl):
+        catalog_to_pkl(training, config.training_pkl)
+
+    if not os.path.exists(config.validation_pkl):
+        catalog_to_pkl(validation, config.validation_pkl)
+
+    return training, validation
+
 
 
 """

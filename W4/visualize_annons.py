@@ -14,7 +14,12 @@ from src import config
 import logging
 import time
 
-from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader, DatasetMapper
+from detectron2.data import (
+    DatasetCatalog,
+    MetadataCatalog,
+    build_detection_test_loader,
+    DatasetMapper,
+)
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer, ColorMode
@@ -37,55 +42,58 @@ def parse_args():
         default=False,
         required=False,
     )
+    parser.add_argument(
+        "-m",
+        "--mots",
+        dest="mots",
+        action="store_true",
+        default=False,
+        required=False,
+    )
     fname = os.path.splitext(parser.prog)
     return parser.parse_args(), fname
 
 
-def use_model(
-    model_name,
-    model_url,
-    training_dataset,
-    validation_dataset,
-    metadata
-):
-    current_output_dir = f"{config.output_path}/models/{model_name}"
+def use_model(model_name, model_url, training_dataset, validation_dataset, metadata):
+    current_output_dir = f"outputs/task_b/models/COCO_KITTI/{model_name}"
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
     os.makedirs(current_output_dir, exist_ok=True)
     cfg.OUTPUT_DIR = f"{current_output_dir}"
-    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
+    # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
+    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")
+
+
     cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
     cfg.DATALOADER.NUM_WORKERS = 4
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(config.thing_classes)
     predictor = DefaultPredictor(cfg)
 
-    for d in validation_dataset:    
+    for d in validation_dataset:
         im = cv2.imread(d["file_name"])
         outputs = predictor(im)
-        v = Visualizer(im[:, :, ::-1],
-                    metadata=MetadataCatalog.get("KITTI_MOTS_train"), 
-                    scale=0.8, 
-                    instance_mode=ColorMode.IMAGE_BW
+        v = Visualizer(
+            im[:, :, ::-1],
+            metadata=MetadataCatalog.get("KITTI_MOTS_train"),
+            scale=0.8,
+            instance_mode=ColorMode.IMAGE_BW,
         )
-        
+
         v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
         cv2.imshow("img", v.get_image()[:, :, ::-1])
         cv2.waitKey(1)
 
-
-    # for d in training_dataset:    
+    # for d in training_dataset:
     #     im = cv2.imread(d["file_name"])
     #     v = Visualizer(im[:, :, ::-1],
-    #                 metadata=MetadataCatalog.get("KITTI_MOTS_train"), 
-    #                 scale=0.8, 
+    #                 metadata=MetadataCatalog.get("KITTI_MOTS_train"),
+    #                 scale=0.8,
     #                 # instance_mode=ColorMode.IMAGE_BW
     #                 instance_mode=ColorMode.IMAGE_BW
     #     )
     #     out = v.draw_dataset_dict(d)
     #     cv2.imshow("img", out.get_image()[:, :, ::-1])
     #     cv2.waitKey(1)
-
-
-
 
     imgUtils.generate_
 
@@ -98,8 +106,9 @@ if __name__ == "__main__":
     ##########################################################################################
     colorama.init(autoreset=False)
     parser, fname = parse_args()
-    
+
     v = parser.verbose
+    mots = parser.mots
     if v:
         print(
             colorama.Fore.LIGHTRED_EX
@@ -121,26 +130,21 @@ if __name__ == "__main__":
 
     if config.verbose:
         print(colorama.Fore.LIGHTMAGENTA_EX + "\nGetting dataset train val split")
-    getDicts.generate_kitti_mots_pkls(
-        config.db_path_kitti_mots,
-        config.imgs_path_kitti_mots,
-        "datasetpkl/train/train_kitti_mots_vis.pkl",
-        "datasetpkl/val/val_kitti_mots_vis.pkl",
-    )
+
+    train, val = getDicts.generate_datasets(mots)
+
     print(f"Train and val datasets generated")
 
     DatasetCatalog.register(
         "KITTI_MOTS_training",
-        lambda: getDicts.register_helper(config.train_pkl_kitti_mots),
+        lambda: getDicts.register_helper(config.training_pkl),
     )
-    MetadataCatalog.get("KITTI_MOTS_training").thing_classes =config.thing_classes
+    MetadataCatalog.get("KITTI_MOTS_training").thing_classes = config.thing_classes
 
     DatasetCatalog.register(
-        "KITTI_MOTS_val", lambda: getDicts.register_helper(config.val_pkl_kitti_mots)
+        "KITTI_MOTS_val", lambda: getDicts.register_helper(config.validation_pkl)
     )
-    MetadataCatalog.get("KITTI_MOTS_val").thing_classes=config.thing_classes
-    train = getDicts.register_helper(config.train_pkl_kitti_mots)
-    val = getDicts.register_helper(config.val_pkl_kitti_mots)
+    MetadataCatalog.get("KITTI_MOTS_val").thing_classes = config.thing_classes
 
     if config.verbose:
         print(colorama.Fore.LIGHTMAGENTA_EX + "Done getting dataset train val split\n")
@@ -165,7 +169,7 @@ if __name__ == "__main__":
             model_url=model_url,
             training_dataset=train,
             validation_dataset=val,
-            metadata=KITTI_MOTS_metadata
+            metadata=KITTI_MOTS_metadata,
         )
         # break
     for model_name, result in config.mask_rcnn_results.items():

@@ -14,6 +14,8 @@ def init_workspace(v=False, _python_filename=""):
     global pkl_path
     global pkl_train_path
     global pkl_val_path
+    global training_pkl
+    global validation_pkl
     global train_pkl_kitti_mots
     global val_pkl_kitti_mots
     global train_pkl_mots_challenge
@@ -37,19 +39,24 @@ def init_workspace(v=False, _python_filename=""):
 
     train_pkl_kitti_mots = f"{pkl_train_path}/train_kitti_mots.pkl"
     train_pkl_mots_challenge = f"{pkl_train_path}/train_mots_challenge.pkl"
-    train_combo = f"{pkl_train_path}/train_combo.pkl"
+    training_pkl = f"{pkl_train_path}/training.pkl"
 
     val_pkl_kitti_mots = f"{pkl_val_path}/val_kitti_mots.pkl"
     val_pkl_mots_challenge = f"{pkl_val_path}/val_mots_challenge.pkl"
-    val_combo = f"{pkl_val_path}/val_combo.pkl"
+    validation_pkl = f"{pkl_val_path}/validation.pkl"
 
     output_path = f"outputs/{python_filename}"
-    txt_results_path = f"txt_results"    
+    txt_results_path = f"{output_path}/txt_results"    
 
     if not os.path.exists(output_path):
         if verbose:
             print(colorama.Fore.MAGENTA + f"Creating {output_path}")
         os.makedirs(output_path)
+
+    if not os.path.exists(txt_results_path):
+        if verbose:
+            print(colorama.Fore.MAGENTA + f"Creating {txt_results_path}")
+        os.makedirs(txt_results_path)
 
     if not os.path.exists(pkl_path):
         if verbose:
@@ -77,31 +84,32 @@ def init_workspace(v=False, _python_filename=""):
     imgs_path_kitti_mots = f"{db_path_kitti_mots}/training/image_02"
     masks_path_mots_challenge = f"{db_path_mots_challenge}/instances"
     imgs_path_mots_challenge = f"{db_path_mots_challenge}/train/images"
+
     mask_rcnn_models = {
-        "R50-FPN_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml",
+        # "R50-FPN_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml",
         "R50-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
-        "R101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
-        "X101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml",
-        "R50-DC5_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_DC5_1x.yaml",
+        # "R101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
+        # "X101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml",
+        # "R50-DC5_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_DC5_1x.yaml",
         "R50-DC5_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_DC5_3x.yaml",
-        "R101-DC5_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_DC5_3x.yaml",
-        "R50-C4_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_1x.yaml",
-        "R50-C4_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml",
-        "R101-C4_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_C4_3x.yaml",
+        # "R101-DC5_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_DC5_3x.yaml",
+        # "R50-C4_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_1x.yaml",
+        # "R50-C4_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml",
+        # "R101-C4_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_C4_3x.yaml",
         "City-R50-FPN" : "Cityscapes/mask_rcnn_R_50_FPN.yaml",
         
     }
     mask_rcnn_results = {
-        "R50-FPN_x1" : "",
+        # "R50-FPN_x1" : "",
         "R50-FPN_x3" : "",
-        "R101-FPN_x3" : "",
-        "X101-FPN_x3" : "",
-        "R50-DC5_x1" : "",
+        # "R101-FPN_x3" : "",
+        # "X101-FPN_x3" : "",
+        # "R50-DC5_x1" : "",
         "R50-DC5_x3" : "",
-        "R101-DC5_x3" : "",
-        "R50-C4_x1" : "",
-        "R50-C4_x3" : "",
-        "R101-C4_x3" : "",
+        # "R101-DC5_x3" : "",
+        # "R50-C4_x1" : "",
+        # "R50-C4_x3" : "",
+        # "R101-C4_x3" : "",
         "City-R50-FPN" : "",
     }
 
