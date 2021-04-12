@@ -74,7 +74,8 @@ def use_model(
     model_group,
     geninference=False,
 ):
-    current_output_dir = f"{config.output_path}/models/COCO_KITTI_MOTSC/{model_name}"
+    hyperparm="ANCHOR64_1024"
+    current_output_dir = f"{config.output_path}/models/{hyperparm}"
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
     os.makedirs(current_output_dir, exist_ok=True)
@@ -99,6 +100,15 @@ def use_model(
         256  # faster, and good enough for this toy dataset (default: 512)
     )
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(config.thing_classes)
+
+
+
+    cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[64, 128, 256, 512,1024]] # [[16, 32, 64, 128, 265]]#[[32, 64, 128, 256, 512]]
+    cfg.MODEL.ANCHOR_GENERATOR.ASPECT_RATIOS = [[0.5, 1.0, 2.0]] 
+    # cfg.MODEL.RPN.IOU_THRESHOLDS = [0.4, 0.8]    
+    # cfg.SOLVER.STEPS = [0,500, 750]
+    # cfg.SOLVER.GAMMA = 0.5
+
     tasks = ("bbox", "segm")
     # cfg.INPUT.MIN_SIZE_TEST = 700
     # cfg.INPUT.MAX_SIZE_TEST = 600
@@ -173,10 +183,10 @@ def use_model(
         print(str(results) + f"\n{time_elapsed}")
         print(f"{model_name} #RESULTS#")
 
-        txt_results_path = f"{config.txt_results_path}/COCO_KITTI_MOTSC"
+        txt_results_path = f"{config.txt_results_path}"
         config.create_txt_results_path(txt_results_path)
 
-        with open(f"{txt_results_path}/{model_name}.txt", "w") as writer:
+        with open(f"{txt_results_path}/{hyperparm}.txt", "w") as writer:
             writer.write(str(results))
             writer.write(f"\n{time_elapsed}")
             if config.verbose:

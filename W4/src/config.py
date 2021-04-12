@@ -97,7 +97,7 @@ def init_workspace(v=False, _python_filename=""):
 
     mask_rcnn_models = {
         # "R50-FPN_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml",
-        # "R50-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
+        "R50-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
         # "R101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
         # "X101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml",
         # "R50-DC5_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_DC5_1x.yaml",
@@ -111,7 +111,7 @@ def init_workspace(v=False, _python_filename=""):
     }
     mask_rcnn_results = {
         # "R50-FPN_x1" : "",
-        # "R50-FPN_x3" : "",
+        "R50-FPN_x3" : "", #######
         # "R101-FPN_x3" : "",
         # "X101-FPN_x3" : "",
         # "R50-DC5_x1" : "",

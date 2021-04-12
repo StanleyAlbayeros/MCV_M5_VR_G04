@@ -58,15 +58,15 @@ def parse_args():
 def use_model(model_name, model_url, training_dataset, validation_dataset, metadata):
     training_sets = "COCO_KITTI_MOTSC"
     # training_sets = "COCO_KITTI"
-    current_output_dir = f"outputs/task_b/models/{training_sets}/{model_name}"
+    current_output_dir = f"outputs/task_a/models/{model_name}"
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
     os.makedirs(current_output_dir, exist_ok=True)
     cfg.OUTPUT_DIR = f"{current_output_dir}"
 
     ## CHANGE BETWEEN CHECKPOINT AND TRAINED MODEL FOR TASK A_B_C
-    # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
-    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")
+    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
+    # cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")
 
     cfg.DATASETS.TEST = ("validation",)
     cfg.DATALOADER.NUM_WORKERS = 4
@@ -75,20 +75,27 @@ def use_model(model_name, model_url, training_dataset, validation_dataset, metad
 
     predictor = DefaultPredictor(cfg)
     i = 0
+
     for d in tqdm(validation_dataset, desc="Image_gen", colour="Magenta"):
+
+        tmpname = d["file_name"]
+        tmpname_list = tmpname.split(os.sep)
+        imgid = d["image_id"]
+        if tmpname_list[-2] != "0010":
+            continue
         im = cv2.imread(d["file_name"])
         outputs = predictor(im)
         v = Visualizer(
             im[:, :, ::-1],
-            metadata=MetadataCatalog.get("training_kitti"),
+            metadata=MetadataCatalog.get("validation"),
             scale=0.8,
             instance_mode=ColorMode.SEGMENTATION,
         )
 
         v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
         img = v.get_image()[:, :, ::-1]
-        # cv2.imshow("img", img)
-        # cv2.waitKey(1)
+        cv2.imshow("img", img)
+        cv2.waitKey(1)
 
         scale_percent = 60  # percent of original size
         width = int(img.shape[1] * scale_percent / 100)
@@ -98,16 +105,13 @@ def use_model(model_name, model_url, training_dataset, validation_dataset, metad
         # resize image
         resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
 
-        tmpname = d["file_name"]
-        tmpname_list = tmpname.split(os.sep)
-        imgid = d["image_id"]
-        filepath = f"{config.gen_img_path}/{training_sets}/{model_name}/PNG/{tmpname_list[-2]}"
+        filepath = f"{config.gen_img_path}/task_a/{model_name}/PNG/{tmpname_list[-2]}"
         filename = f"{filepath}/{imgid}.png"
         config.create_txt_results_path(filepath)
 
         
 
-        cv2.imwrite(filename, img)
+        # cv2.imwrite(filename, img)
 
     # for d in training_dataset:
     #     im = cv2.imread(d["file_name"])
