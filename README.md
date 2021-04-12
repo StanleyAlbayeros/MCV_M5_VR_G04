@@ -51,3 +51,22 @@ Tasks:
 [Go to updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/W3/Paper)
 
 [Go to paper's Overleaf project](https://www.overleaf.com/project/604d81350cf6b14c73c264c0)
+
+## Week 4
+
+This week we continue our Detectron2 adventures using pre-trained Mask-RCNN on the exising KITTI-MOTS and MOTSChallenge datasets.
+
+Tasks:
+- Apply pre-trained Mask-RCNN models to KITTI-MOTS validation set. 🆗
+- Train Mask-RCNN model on KITTI-MOTS and MOTSChallenge training sets and evaluate on KITTIMOTS validation set. 🆗
+- Explore and analyze the impact of different hyperparameters. ❗
+- Extend Related Work and Experiments section on your paper. 🆗
+
+[Google Slides Week 4](https://docs.google.com/presentation/d/1M6MtlGSnmqRxuT2TkZ-Tu5YOu-TvQ4f1bfRBS3Je5NI/edit#slide=id.gc95a16a8e7_0_0)
+(We filled in the slides linked in the instructions PDF)
+
+[Read updated PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/W4/Paper/main.pdf)
+
+[Go to updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/W4/Paper)
+
+[Go to paper's Overleaf project](https://www.overleaf.com/project/604d81350cf6b14c73c264c0)
