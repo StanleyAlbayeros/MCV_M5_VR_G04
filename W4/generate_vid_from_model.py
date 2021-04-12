@@ -13,6 +13,7 @@ import random
 from src import config
 import logging
 import time
+from tqdm import tqdm
 
 from detectron2.data import (
     DatasetCatalog,
@@ -42,12 +43,22 @@ def parse_args():
         default=False,
         required=False,
     )
+    parser.add_argument(
+        "-m",
+        "--mots",
+        dest="mots",
+        action="store_true",
+        default=False,
+        required=False,
+    )
     fname = os.path.splitext(parser.prog)
     return parser.parse_args(), fname
 
 
 def use_model(model_name, model_url, training_dataset, validation_dataset, metadata):
-    current_output_dir = f"{config.output_path}/models/COCO_KITTI/{model_name}"
+    training_sets = "COCO_KITTI_MOTSC"
+    # training_sets = "COCO_KITTI"
+    current_output_dir = f"outputs/task_b/models/{training_sets}/{model_name}"
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
     os.makedirs(current_output_dir, exist_ok=True)
@@ -57,25 +68,46 @@ def use_model(model_name, model_url, training_dataset, validation_dataset, metad
     # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
     cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")
 
-
     cfg.DATASETS.TEST = ("validation",)
     cfg.DATALOADER.NUM_WORKERS = 4
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7  # set a custom testing threshold
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(config.thing_classes)
 
     predictor = DefaultPredictor(cfg)
-    for d in validation_dataset:
+    i = 0
+    for d in tqdm(validation_dataset, desc="Image_gen", colour="Magenta"):
         im = cv2.imread(d["file_name"])
         outputs = predictor(im)
         v = Visualizer(
             im[:, :, ::-1],
-            metadata=MetadataCatalog.get("KITTI_MOTS_train"),
+            metadata=MetadataCatalog.get("training_kitti"),
             scale=0.8,
-            instance_mode=ColorMode.IMAGE_BW,
+            instance_mode=ColorMode.SEGMENTATION,
         )
 
         v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-        cv2.imshow("img", v.get_image()[:, :, ::-1])
-        cv2.waitKey(1)
+        img = v.get_image()[:, :, ::-1]
+        # cv2.imshow("img", img)
+        # cv2.waitKey(1)
+
+        scale_percent = 60  # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+
+        # resize image
+        resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
+        tmpname = d["file_name"]
+        tmpname_list = tmpname.split(os.sep)
+        imgid = d["image_id"]
+        filepath = f"{config.gen_img_path}/{training_sets}/{model_name}/PNG/{tmpname_list[-2]}"
+        filename = f"{filepath}/{imgid}.png"
+        config.create_txt_results_path(filepath)
+
+        
+
+        cv2.imwrite(filename, img)
 
     # for d in training_dataset:
     #     im = cv2.imread(d["file_name"])
@@ -89,10 +121,6 @@ def use_model(model_name, model_url, training_dataset, validation_dataset, metad
     #     cv2.imshow("img", out.get_image()[:, :, ::-1])
     #     cv2.waitKey(1)
 
-    imgUtils.generate_
-
-    return results
-
 
 if __name__ == "__main__":
     ##########################################################################################
@@ -100,6 +128,7 @@ if __name__ == "__main__":
     ##########################################################################################
     colorama.init(autoreset=False)
     parser, fname = parse_args()
+    mots = parser.mots
 
     v = parser.verbose
     if v:
@@ -129,15 +158,21 @@ if __name__ == "__main__":
     print(f"Train and val datasets generated")
 
     DatasetCatalog.register(
-        "training",
-        lambda: getDicts.register_helper(config.training_pkl),
+        "training_kitti",
+        lambda: getDicts.register_helper(config.train_pkl_kitti_mots),
     )
-    MetadataCatalog.get("training").thing_classes = config.thing_classes
+    MetadataCatalog.get("training_kitti").set(thing_classes=config.thing_classes)
+    MetadataCatalog.get("training_kitti").thing_colors = config.thing_colors
+    DatasetCatalog.register(
+        "training_motsc",
+        lambda: getDicts.register_helper(config.train_pkl_mots_challenge),
+    )
+    MetadataCatalog.get("training_motsc").set(thing_classes=config.thing_classes)
 
     DatasetCatalog.register(
         "validation", lambda: getDicts.register_helper(config.validation_pkl)
     )
-    MetadataCatalog.get("validation").thing_classes = config.thing_classes
+    MetadataCatalog.get("validation").set(thing_classes=config.thing_classes)
 
     if config.verbose:
         print(colorama.Fore.LIGHTMAGENTA_EX + "Done getting dataset train val split\n")

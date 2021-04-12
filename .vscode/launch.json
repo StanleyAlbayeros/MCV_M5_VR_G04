@@ -30,6 +30,19 @@
             "args": ["-l", "-v", "-i"]
             // "args": ["-l", "-v"]
             
+        } 
+        {
+            "name": "Python: generation",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/W4",
+            "program": "generate_vid_from_model.py",
+            "console": "integratedTerminal",
+            // "args": ["-l", "-v", "-gs"]
+            // "args": ["-l", "-v", "-i", "-gs"]
+            "args": ["-m"]
+            // "args": ["-l", "-v"]
+            
         }
     ]
 }

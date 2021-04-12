@@ -11,6 +11,7 @@ def init_workspace(v=False, _python_filename=""):
     global imgs_path_mots_challenge
     global output_path
     global txt_results_path
+    global gen_img_path
     global pkl_path
     global pkl_train_path
     global pkl_val_path
@@ -29,6 +30,8 @@ def init_workspace(v=False, _python_filename=""):
     global cityscapes_results
     global python_filename
     global verbose
+    global thing_colors
+
 
 
     python_filename = _python_filename
@@ -46,7 +49,8 @@ def init_workspace(v=False, _python_filename=""):
     validation_pkl = f"{pkl_val_path}/validation.pkl"
 
     output_path = f"outputs/{python_filename}"
-    txt_results_path = f"{output_path}/txt_results"    
+    txt_results_path = f"{output_path}/txt_results" 
+    gen_img_path = f"{output_path}"    
 
     if not os.path.exists(output_path):
         if verbose:
@@ -57,6 +61,11 @@ def init_workspace(v=False, _python_filename=""):
         if verbose:
             print(colorama.Fore.MAGENTA + f"Creating {txt_results_path}")
         os.makedirs(txt_results_path)
+
+    if not os.path.exists(gen_img_path):
+        if verbose:
+            print(colorama.Fore.MAGENTA + f"Creating {gen_img_path}")
+        os.makedirs(gen_img_path)
 
     if not os.path.exists(pkl_path):
         if verbose:
@@ -76,6 +85,7 @@ def init_workspace(v=False, _python_filename=""):
 
 
     thing_classes = ["Person", "Other", "Car"]
+    thing_colors = [(50,255,50), (102,255,255), (255,50,255)]
 
     base_dir = "../resources"
     db_path_kitti_mots = f"{base_dir}/KITTI-MOTS"
@@ -87,7 +97,7 @@ def init_workspace(v=False, _python_filename=""):
 
     mask_rcnn_models = {
         # "R50-FPN_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml",
-        "R50-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
+        # "R50-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
         # "R101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
         # "X101-FPN_x3" : "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml",
         # "R50-DC5_x1" : "COCO-InstanceSegmentation/mask_rcnn_R_50_DC5_1x.yaml",
@@ -101,7 +111,7 @@ def init_workspace(v=False, _python_filename=""):
     }
     mask_rcnn_results = {
         # "R50-FPN_x1" : "",
-        "R50-FPN_x3" : "",
+        # "R50-FPN_x3" : "",
         # "R101-FPN_x3" : "",
         # "X101-FPN_x3" : "",
         # "R50-DC5_x1" : "",

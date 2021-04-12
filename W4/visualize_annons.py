@@ -60,13 +60,15 @@ def use_model(model_name, model_url, training_dataset, validation_dataset, metad
     cfg.merge_from_file(model_zoo.get_config_file(model_url))
     os.makedirs(current_output_dir, exist_ok=True)
     cfg.OUTPUT_DIR = f"{current_output_dir}"
+
     # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_url)
     cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")
 
 
-    cfg.DATASETS.TEST = ("KITTI_MOTS_val",)
+    cfg.DATASETS.TEST = ("validation",)
     cfg.DATALOADER.NUM_WORKERS = 4
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(config.thing_classes)
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7  # set a custom testing threshold
     predictor = DefaultPredictor(cfg)
 
     for d in validation_dataset:
@@ -74,13 +76,14 @@ def use_model(model_name, model_url, training_dataset, validation_dataset, metad
         outputs = predictor(im)
         v = Visualizer(
             im[:, :, ::-1],
-            metadata=MetadataCatalog.get("KITTI_MOTS_train"),
+            metadata=MetadataCatalog.get("training_kitti"),
             scale=0.8,
             instance_mode=ColorMode.IMAGE_BW,
         )
 
         v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-        cv2.imshow("img", v.get_image()[:, :, ::-1])
+        img = v.get_image()[:, :, ::-1]
+        cv2.imshow("img", img)
         cv2.waitKey(1)
 
     # for d in training_dataset:
@@ -136,15 +139,21 @@ if __name__ == "__main__":
     print(f"Train and val datasets generated")
 
     DatasetCatalog.register(
-        "KITTI_MOTS_training",
-        lambda: getDicts.register_helper(config.training_pkl),
+        "training_kitti",
+        lambda: getDicts.register_helper(config.train_pkl_kitti_mots),
     )
-    MetadataCatalog.get("KITTI_MOTS_training").thing_classes = config.thing_classes
+    MetadataCatalog.get("training_kitti").set(thing_classes=config.thing_classes)
 
     DatasetCatalog.register(
-        "KITTI_MOTS_val", lambda: getDicts.register_helper(config.validation_pkl)
+        "training_motsc",
+        lambda: getDicts.register_helper(config.train_pkl_mots_challenge),
     )
-    MetadataCatalog.get("KITTI_MOTS_val").thing_classes = config.thing_classes
+    MetadataCatalog.get("training_motsc").set(thing_classes=config.thing_classes)
+
+    DatasetCatalog.register(
+        "validation", lambda: getDicts.register_helper(config.validation_pkl)
+    )
+    MetadataCatalog.get("validation").set(thing_classes=config.thing_classes)
 
     if config.verbose:
         print(colorama.Fore.LIGHTMAGENTA_EX + "Done getting dataset train val split\n")

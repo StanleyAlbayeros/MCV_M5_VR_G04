@@ -7,7 +7,7 @@ from numpy import nan
 import csv
 
 # This string is slightly different from your sample which had an extra bracket
-RESULTS_PATH="../outputs/task_b/txt_results/COCO_KITTI/"
+RESULTS_PATH="../outputs/task_b/txt_results/COCO_KITTI_MOTSC/"
 def read_file(file):
     f = open(os.path.join(RESULTS_PATH, file), "r")
     line = f.readline()
