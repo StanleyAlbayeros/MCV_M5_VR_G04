@@ -347,7 +347,7 @@ We will be using this AP:Time ratio metric to "promote" the models to use on the
 \centering
 \begin{tabularx}{\textwidth}{lcccccc}
 \hline
-                                            & \multicolumn{1}{l}{\textbf{AP}} & \multicolumn{1}{l}{\textbf{AP50}} & \multicolumn{1}{l}{\textbf{AP-Person}} & \multicolumn{1}{l}{\textbf{AP-Car}} & \multicolumn{1}{l}{\textbf{Elapsed Time}} & \multicolumn{1}{l}{\textbf{ratio AP:Time}} \\ \cline{1-7}
+                                            & \multicolumn{1}{l}{\textbf{AP}} & \multicolumn{1}{l}{\textbf{AP50}} & \multicolumn{1}{l}{\textbf{AP-Person}} & \multicolumn{1}{l}{\textbf{AP-Car}} & \multicolumn{1}{l}{\textbf{Elapsed Time}} & \multicolumn{1}{l}{\textbf{ratio AP:Time}} \\ \hline
 \multicolumn{1}{|l|}{\textbf{R50-FPN\_x3}}  & \multicolumn{1}{c|}{53,02}      & \multicolumn{1}{c|}{80,72}        & \multicolumn{1}{c|}{38,44}             & 67,6                                & 195,42                                    & 4,68                                       \\ \cline{1-7}
 \multicolumn{1}{|l|}{\textbf{R50-FPN\_x1}}  & \multicolumn{1}{c|}{50,98}      & \multicolumn{1}{c|}{79,93}        & \multicolumn{1}{c|}{36,22}             & 65,73                               & 215,17                                    & 10,51                                      \\ \cline{1-7}
 \multicolumn{1}{|l|}{\textbf{R101-FPN\_x3}} & \multicolumn{1}{c|}{51,43}      & \multicolumn{1}{c|}{78,35}        & \multicolumn{1}{c|}{36,59}             & 66,27                               & 220,54                                    & 6,40                                       \\ \cline{1-7}
@@ -374,31 +374,6 @@ In this task,we trained the networks with different datasets and evaluate all th
 \end{itemize}
 
 From the results and looking at the datasets, we can see that KITTI-MOTTS improves the model's AP when detecting cars, while MOTSChallenge does it with pedestrian detection. Cityscapes provides a boost to both classes' AP values. 
-
-
-% Please add the following required packages to your document preamble:
-% \usepackage{booktabs}
-\begin{table}[h]
-\centering
-\resizebox{width=\columnwidth*0.8}{!}{\begin{tabular}{@{}llrr@{}}
-\toprule
-                                   &                                   & \multicolumn{1}{l}{R50-FPN\_x3} & \multicolumn{1}{l}{R50-DC5\_x3} \\ \midrule
-\multicolumn{1}{|l|}{AP}           & \multicolumn{1}{l|}{bbox}         & \multicolumn{1}{r|}{59,30}      & \multicolumn{1}{r|}{55,41}      \\ \midrule
-\multicolumn{1}{|l|}{AP}           & \multicolumn{1}{l|}{segmentation} & \multicolumn{1}{r|}{52,99}      & \multicolumn{1}{r|}{47,94}      \\ \midrule
-\multicolumn{1}{|l|}{AP50}         & \multicolumn{1}{l|}{bbox}         & \multicolumn{1}{r|}{80,46}      & \multicolumn{1}{r|}{79,99}      \\ \midrule
-\multicolumn{1}{|l|}{AP50}         & \multicolumn{1}{l|}{segmentation} & \multicolumn{1}{r|}{79,27}      & \multicolumn{1}{r|}{76,99}      \\ \midrule
-\multicolumn{1}{|l|}{AP-Person}    & \multicolumn{1}{l|}{bbox}         & \multicolumn{1}{r|}{51,40}      & \multicolumn{1}{r|}{46,12}      \\ \midrule
-\multicolumn{1}{|l|}{AP-Person}    & \multicolumn{1}{l|}{segmentation} & \multicolumn{1}{r|}{39,81}      & \multicolumn{1}{r|}{31,66}      \\ \midrule
-\multicolumn{1}{|l|}{AP-Car}       & \multicolumn{1}{l|}{bbox}         & \multicolumn{1}{r|}{67,19}      & \multicolumn{1}{r|}{64,69}      \\ \midrule
-\multicolumn{1}{|l|}{AP-Car}       & \multicolumn{1}{l|}{segmentation} & \multicolumn{1}{r|}{66,16}      & \multicolumn{1}{r|}{64,22}      \\ \midrule
-\multicolumn{1}{|l|}{Elapsed Time} & \multicolumn{1}{l|}{}             & \multicolumn{1}{r|}{348,38}     & \multicolumn{1}{r|}{651,98}     \\ \midrule
-ratio AP:Time                      &                                   & 5,88                            & 11,77                           \\ \bottomrule
-
-\end{tabular}}
-
-\caption{Trained on COCO + KITTI-MOTS datasets and validate on KITTI-MOTS}
-\label{table:task_b_COCO_kittimots}
-\end{table}
 \subsection{Task C}
 We tested our hyperparameters on the R50-FPN-x3, since it had the best performing AP to time ratio and would let us run tests faster while providing good results.
 \begin{itemize}
@@ -406,12 +381,12 @@ We tested our hyperparameters on the R50-FPN-x3, since it had the best performin
     \item ANCHOR-GENERATOR.SIZES ([64, 128, 256, 512,1024]] - [[32, 64, 128, 256, 512])
     \item ANCHOR-GENERATOR.ASPECT-RATIOS ([[0.5, 1.0, 2.0]] - [[0.25, 0.5, 1.0]])
 \end{itemize}
-We are satisfied by the ~10 pt increase to AP at the cost of half a minute of training more than the results in task b. The model trains very fast and performs noticeably better than the “out of the box” model in Model Zoo. Even though an untrained X101-FPN-x3 performs similarly and has a large time saving, it’s important to point out that the VRAM usage for the R50 model is very low. On the longest testing run, the R50 model took up ~6GB of VRAM using MOTSChallenge+Kitti-Mots, while the X101 model had to be trained on the server as it didn’t fit a 10GB GPU.
- 
-
+We are satisfied by the ~10 pt increase to AP at the cost of half a minute of training more than the results in task b. The model trains very fast and performs noticeably better than the “out of the box” model in Model Zoo. Even though an untrained X101-FPN-x3 performs similarly and has a large time saving, it’s important to point out that the VRAM usage for the R50 model is very low. On the longest testing run, the R50 model took up ~6GB of VRAM using MOTSChallenge+Kitti-Mots, while the X101 model had to be trained on the server as it didn’t fit a 10GB GPU.  \newpage
+  
+  \newpage
 % Please add the following required packages to your document preamble:
 % \usepackage{booktabs}
-\begin{table}[h]
+\begin{table}[]
 \centering
 \resizebox{\columnwidth}{!}{\begin{tabular}{@{}llrr@{}}
 \toprule
@@ -433,9 +408,9 @@ ratio AP:Time                      &                                   & 5,88   
 \label{table:task_b_COCO_kittimots}
 \end{table}
 
-\begin{table}[]
+\begin{table*}[]
     \centering
-\begin{tabular}{|l|l|r|r|} \cline{1-4}
+\begin{tabularx}{\textwidth*0.5}{|l|l|r|r|} \hline
               &              & \multicolumn{1}{l|}{R50-FPN\_x3} & \multicolumn{1}{l|}{R50-DC5\_x3} \\ \cline{1-4}
 AP            & bbox         & 58,63                            & 56,44                            \\ \cline{1-4}
 AP            & segmentation & 53,53                            & 50,02                            \\ \cline{1-4}
@@ -447,12 +422,13 @@ AP-Car        & bbox         & 65,63                            & 63,19         
 AP-Car        & segmentation & 65,45                            & 62,14                            \\ \cline{1-4}
 Elapsed Time  &              & 407,87                           & 772,37                           \\ \cline{1-4}
 ratio AP:Time &              & 6,96                             & 13,69                            \\ \cline{1-4} 
-\end{tabular}
+\end{tabularx}
 \caption{\label{table:task_b_COCO_motschallenge}Trained on COCO + KITTI-MOTS + MOTSChallenge datasets and validate on KITTI-MOTS.}
-\end{table}
+\end{table*}
+
 \begin{table*}[]
 \centering
-\begin{tabularx}{\textwidth}{|l|l|r|r|} \cline{1-4}
+\begin{tabularx}{\textwidth}{|l|l|r|r|} \hline
               &               & \multicolumn{1}{l|}{C + K} & \multicolumn{1}{l|}{C + K + M} \\ \cline{1-4}
 AP            & bbox          & 63,10                      & 61,13                          \\ \cline{1-4}
 AP            & segmentation  & 56,70                      & 55,81                          \\ \cline{1-4}
@@ -468,8 +444,5 @@ ratio AP:Time & ratio AP:Time & 11,28                      & 11,35              
 \caption{\label{table:task_b_coco_cityscapes_kittimots_motschallenge}Using Cityscapes data on coco + (K)ITTI or Coco + (K)ITTI + (M)OTSChallenge.}
 \end{table*}
 
-  
-  \newpage
-  \clearpage
 \printbibliography
 \end{document}
