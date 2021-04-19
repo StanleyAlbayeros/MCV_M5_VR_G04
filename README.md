@@ -107,6 +107,6 @@ Tasks:
 
 [Read updated PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/W5/paper/main.pdf)
 
-[Go to updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/W5/Paper)
+[Go to updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/W5/paper)
 
 [Go to paper's Overleaf project](https://www.overleaf.com/project/607c8c7a457eb75830df6863)
