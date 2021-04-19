@@ -2,7 +2,7 @@
     "python.pythonPath": "/home/drkztan/anaconda3/envs/det2/bin/python",
     "python.formatting.provider": "black",
     "jupyter.jupyterServerType": "local",
-    "python.linting.pylintEnabled": true,
-    "python.linting.flake8Enabled": false,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
     "python.linting.enabled": true
 }
