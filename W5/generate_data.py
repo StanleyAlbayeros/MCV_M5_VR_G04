@@ -36,7 +36,7 @@ from src import config, imgUtils, cooc_tools
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Task_b: get co-occurrence matrices on coco_2017_val / generate images for coco_mod set"
+        description="Task B,C,D: get co-occurrence matrices as csv or plots"
     )
     fname = os.path.splitext(parser.prog)
     parser.add_argument(
@@ -137,7 +137,7 @@ def use_model(model_name, model_url):
         outputs = predictor(im)
         # v = Visualizer(
         #     im[:, :, ::-1],
-        #     metadata=MetadataCatalog.get(coco_2017_val_dataset),
+        #     metadata=MetadataCatalog.get(coco_2017_train_dataset),
         #     scale=1,
         #     instance_mode=ColorMode.IMAGE_BW,
         # )

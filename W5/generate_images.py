@@ -29,7 +29,7 @@ from src import config, imgUtils
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="visualize annotations")
+    parser = argparse.ArgumentParser(description="Task A,B,C,D: Generate images")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -68,6 +68,7 @@ def use_model(model_name, model_url):
     # out_of_contex_dir = "datasets/coco_mod/mods"
     # out_of_contex_dir = "datasets/coco_mod_c/mods"
     # out_of_contex_dir = "datasets/coco/val2017"
+    # out_of_contex_dir = "datasets/coco/train2017"
     out_of_contex_dir = "datasets/coco_mod_d/mods"
 
     predictor = DefaultPredictor(cfg)
