@@ -1,0 +1,10 @@
+Class_names,person,traffic light,parking meter,bird,horse,backpack,bowl,chair,potted plant
+person,510,44,57,0,140,37,0,0,0
+traffic light,44,4,5,0,12,3,0,0,0
+parking meter,57,5,7,0,15,4,0,0,0
+bird,0,0,0,1,0,0,1,2,1
+horse,140,12,15,0,54,9,0,0,0
+backpack,37,3,4,0,9,3,0,0,0
+bowl,0,0,0,1,0,0,3,4,3
+chair,0,0,0,2,0,0,4,6,4
+potted plant,0,0,0,1,0,0,3,4,3

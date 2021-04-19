@@ -40,13 +40,15 @@ def init_workspace(parser, _python_filename=""):
     global plt_path
 
     v = parser.verbose
-    output_csv = parser.output_csv
-    load_csv = parser.load_csv
-    generate_images = parser.generate_images
-    run_model = parser.run_model
-    plt_filename = parser.plt_filename
-
     python_filename = _python_filename
+
+    if python_filename == "task_b":
+        output_csv = parser.output_csv
+        load_csv = parser.load_csv
+        generate_images = parser.generate_images
+        run_model = parser.run_model
+        plt_filename = parser.plt_filename
+
     verbose = v
     pkl_path = "datasetpkl"
     pkl_train_path = f"{pkl_path}/train"
@@ -100,11 +102,12 @@ def init_workspace(parser, _python_filename=""):
             print(colorama.Fore.MAGENTA + f"Creating {pkl_val_path}")
         os.makedirs(pkl_val_path)
 
-    output_csv = Path(f"{output_csv}").stem
-    csv_filename = f"{csv_path}/{output_csv}"
+    if python_filename == "task_b":
+        output_csv = Path(f"{output_csv}").stem
+        csv_filename = f"{csv_path}/{output_csv}"
 
-    plt_filename = Path(f"{plt_filename}").stem
-    plt_path = f"{plt_path}/{plt_filename}.png"
+        plt_filename = Path(f"{plt_filename}").stem
+        plt_filename = f"{plt_path}/{plt_filename}"
 
     thing_classes = ["Person", "Other", "Car"]
     thing_colors = [(50, 255, 50), (102, 255, 255), (255, 50, 255)]
@@ -156,4 +159,8 @@ def create_txt_results_path(target_path):
 
 
 def csv_save_path(add=""):
-    return f"{csv_filename}_{add}.csv"
+    return f"{csv_filename}{add}.csv"
+
+
+def plt_save_path(add=""):
+    return f"{plt_filename}{add}.png"

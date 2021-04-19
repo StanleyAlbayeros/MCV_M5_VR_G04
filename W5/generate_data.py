@@ -119,7 +119,9 @@ def use_model(model_name, model_url):
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7  # set a custom testing threshold
 
     # out_of_contex_dir = "../resources/out_of_context"
-    out_of_contex_dir = "datasets/coco/val2017"
+    input_img_dir = "datasets/coco_mod_d/originals"
+    # input_img_dir = "datasets/coco_mod_d/mods"
+    # input_img_dir = "outputs/task_a/imgs/coco_mod/mix"
 
     predictor = DefaultPredictor(cfg)
     i = 0
@@ -127,10 +129,10 @@ def use_model(model_name, model_url):
     pred_dict["Class_names"] = MetadataCatalog.get(coco_2017_val_dataset).thing_classes
 
     for filename in tqdm(
-        os.listdir(out_of_contex_dir), desc="Image_gen", colour="Magenta"
+        os.listdir(input_img_dir), desc="Image_gen", colour="Magenta"
     ):
 
-        im = cv2.imread(os.path.join(out_of_contex_dir, filename))
+        im = cv2.imread(os.path.join(input_img_dir, filename))
 
         outputs = predictor(im)
         # v = Visualizer(
@@ -210,12 +212,13 @@ if __name__ == "__main__":
     ##############################   PRETRAINED MODEL INFERENCE   ############################
     ##########################################################################################
 
-    cooc_mat = []
+
     if config.run_model is True:
         cooc_mat = run_model()
-        cooc_tools.save_dataframe(cooc_mat, "cooc_df")
-        cooc_tools.save_cooc_plot(cooc_mat)
-    # else:
+    else:
+        cooc_mat = cooc_tools.load_cooc_from_csv()
+
+    cooc_tools.save_cooc_plot(cooc_mat)
 
     ##########################################################################################
     ##############################   PRETRAINED MODEL INFERENCE   ############################

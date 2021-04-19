@@ -1,34 +1,29 @@
 import argparse
+import logging
 import os
 import pickle
+import random
+import sys
+import time
+from pathlib import Path
 
+import colorama
 import cv2
 import matplotlib.pyplot as plt
 import pycocotools.mask as rletools
-import getDicts
-from pycocotools import coco
-import sys
-import colorama
-import random
-from src import config
-import logging
-import time
-from tqdm import tqdm
-
-from detectron2.data import (
-    DatasetCatalog,
-    MetadataCatalog,
-    build_detection_test_loader,
-    DatasetMapper,
-)
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
-from detectron2.utils.visualizer import Visualizer, ColorMode
-from detectron2.modeling import build_model
-from detectron2.engine import DefaultTrainer
-from detectron2.engine import DefaultPredictor
+from detectron2.data import (DatasetCatalog, DatasetMapper, MetadataCatalog,
+                             build_detection_test_loader)
+from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
-from src import imgUtils
+from detectron2.modeling import build_model
+from detectron2.utils.visualizer import ColorMode, Visualizer
+from pycocotools import coco
+from tqdm import tqdm
+
+import getDicts
+from src import config, imgUtils
 
 ### 158.109.75.51 –p 55022
 
@@ -66,14 +61,32 @@ def use_model(model_name, model_url):
     cfg.DATASETS.TEST = ("coco_2017_val",)
     cfg.DATALOADER.NUM_WORKERS = 4
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7  # set a custom testing threshold
-    out_of_contex_dir = "../resources/out_of_context"
+
+    # just swap the comments on the next 4 lines to generate either ooc or coco samples
+    # out_of_contex_dir = "../resources/out_of_context"
+    mode = "coco_mod"
+    # out_of_contex_dir = "datasets/coco_mod/mods"
+    # out_of_contex_dir = "datasets/coco_mod_c/mods"
+    # out_of_contex_dir = "datasets/coco/val2017"
+    out_of_contex_dir = "datasets/coco_mod_d/mods"
 
     predictor = DefaultPredictor(cfg)
-    i = 0
 
-    for filename in tqdm(os.listdir(out_of_contex_dir), desc="Image_gen", colour="Magenta"):
+    images_in_dir = os.listdir(out_of_contex_dir)
 
-        im = cv2.imread(os.path.join(out_of_contex_dir,filename))
+    # ooc only has 43 images, so check for that anyways. Only take a random sample if 
+    # it's the coco val dataset because qualitative results in 5k images is dumb
+    # if len(images_in_dir) > 43:
+    #     mode = "coco"
+    #     list_of_images = random.sample(images_in_dir, 25)
+
+
+
+    for filename in tqdm(images_in_dir, desc="Image_gen", colour="Magenta"):
+        
+        img_no_ext = Path(f"{filename}").stem
+
+        im = cv2.imread(os.path.join(out_of_contex_dir, filename))
         outputs = predictor(im)
         v = Visualizer(
             im[:, :, ::-1],
@@ -81,21 +94,31 @@ def use_model(model_name, model_url):
             scale=1,
             instance_mode=ColorMode.IMAGE_BW,
         )
-
-        v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+        ##### to draw all classes, pass instances to line 98, or "dogs" and change class
+        ##### index to pass a single class
+        instances = outputs["instances"].to("cpu")
+        # print(MetadataCatalog.get("coco_2017_val"))
+        dogs = instances[instances.pred_classes == 77]
+        # print(instances)
+        v = v.draw_instance_predictions(instances)
         img = v.get_image()[:, :, ::-1]
         # cv2.imshow("img", img)
-       
+
         # k = cv2.waitKey(0)
         # if k==27:    # Esc key to stop
         #     exit()
 
-        filepath = f"{config.gen_img_path}"
-        filename = f"{filepath}/{filename}"
-        config.create_txt_results_path(filepath)
-        # print(filename)
+        filepath_originals = f"{config.gen_img_path}/task_d_outputs/originals"
+        filename_original = f"{filepath_originals}/{img_no_ext}_original.png"
+        filepath_out = f"{config.gen_img_path}/task_d_outputs/result"
+        filename_out = f"{filepath_out}/{img_no_ext}_out.png"
 
-        cv2.imwrite(filename, img)
+        config.create_txt_results_path(filepath_originals)
+        config.create_txt_results_path(filepath_out)
+        
+        ###uncomment below only if you also want the originals
+        cv2.imwrite(filename_original, im)
+        cv2.imwrite(filename_out, img)
 
 
 if __name__ == "__main__":
@@ -114,7 +137,7 @@ if __name__ == "__main__":
             + str(parser)
         )
 
-    config.init_workspace(v, fname[0])
+    config.init_workspace(parser, fname[0])
     if config.verbose:
         logging.basicConfig(level=logging.INFO)
 
@@ -122,11 +145,9 @@ if __name__ == "__main__":
     ###################################   WORKSPACE SETUP   ##################################
     ##########################################################################################
 
-
     ##########################################################################################
     ##############################   PRETRAINED MODEL INFERENCE   ############################
     ##########################################################################################
-
 
     for model_name, model_url in config.mask_rcnn_models.items():
         if config.verbose:
@@ -135,8 +156,7 @@ if __name__ == "__main__":
                 + f"\nUsing {model_name} from url {model_url}"
             )
         config.mask_rcnn_results[f"{model_name}"] = use_model(
-            model_name=model_name,
-            model_url=model_url
+            model_name=model_name, model_url=model_url
         )
         # break
     for model_name, result in config.mask_rcnn_results.items():
