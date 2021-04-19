@@ -96,15 +96,17 @@ On this final week, we strike back at Detectron2 and try to break a Mask-RCNN mo
 
 Tasks:
 - Apply pre-trained MaskRCNN on COCO in Out-of-Context Dataset. 🆗
-- Train Mask-RCNN model on KITTI-MOTS and MOTSChallenge training sets and evaluate on KITTIMOTS validation set. 🆗
-- Explore and analyze the impact of different hyperparameters. ❗
-- Extend Related Work and Experiments section on your paper. 🆗
+- Transplanting new objects by co-occurrence. 🆗
+- Qualitative Transplant. 🆗
+- Feature interference. 🆗
+- Style transfer (optional). 🚫
+- Final paper. 🆗
+- Prepare an oral presentation. 🆗 (Oral presentation is using the same week 5 slides)
 
-[Google Slides Week 4](https://docs.google.com/presentation/d/1M6MtlGSnmqRxuT2TkZ-Tu5YOu-TvQ4f1bfRBS3Je5NI/edit#slide=id.gc95a16a8e7_0_0)
-(We filled in the slides linked in the instructions PDF)
+[Google Slides Week 5](https://docs.google.com/presentation/d/1gN8hfeMTsXEnIbEMWiaSaBhL4b8uqlnI06-Hf-BUaDs/edit?usp=sharing)
 
-[Read updated PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/W4/paper/main.pdf)
+[Read updated PDF](https://github.com/drkztan/MCV_M5_VR_G04/blob/main/W5/paper/main.pdf)
 
-[Go to updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/W4/Paper)
+[Go to updated paper's Latex source code](https://github.com/drkztan/MCV_M5_VR_G04/tree/main/W5/Paper)
 
-[Go to paper's Overleaf project](https://www.overleaf.com/project/604d81350cf6b14c73c264c0)
+[Go to paper's Overleaf project](https://www.overleaf.com/project/607c8c7a457eb75830df6863)
